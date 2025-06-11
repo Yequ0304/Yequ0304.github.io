@@ -1,0 +1,1600 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星图共链 - 用户共创</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind 配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6a11cb',
+                        secondary: '#2575fc',
+                        accent: '#34d399',
+                        dark: '#1e293b',
+                        light: '#f8fafc'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <!-- 自定义工具类 -->
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .gradient-bg {
+                background: linear-gradient(135deg, var(--tw-gradient-stops));
+            }
+            .card-hover {
+                transition: all 0.3s ease;
+            }
+            .card-hover:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            .glass-effect {
+                backdrop-filter: blur(10px);
+                background-color: rgba(255, 255, 255, 0.7);
+            }
+            .animate-pulse-slow {
+                animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            }
+        }
+    </style>
+    
+    <style>
+        /* 全局样式 */
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+        
+        /* 动画效果 */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
+        
+        /* 项目状态标签 */
+        .status-recruiting {
+            @apply bg-blue-100 text-blue-800;
+        }
+        .status-creating {
+            @apply bg-green-100 text-green-800;
+        }
+        .status-completed {
+            @apply bg-purple-100 text-purple-800;
+        }
+        .status-ended {
+            @apply bg-yellow-100 text-yellow-800;
+        }
+        
+        /* 进度条样式 */
+        .progress-bar {
+            height: 6px;
+            border-radius: 3px;
+            background: #e1e5eb;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-inter">
+    <!-- 顶部导航栏 -->
+    <header id="navbar" class="fixed w-full top-0 z-50 transition-all duration-300">
+        <div class="glass-effect border-b border-gray-200">
+            <div class="container mx-auto px-4 py-3">
+                <div class="flex items-center justify-between">
+                    <!-- Logo -->
+                    <div class="flex items-center space-x-2">
+                        <div class="w-10 h-10 rounded-lg gradient-bg from-primary to-secondary flex items-center justify-center">
+                            <i class="fa fa-link text-white text-xl"></i>
+                        </div>
+                        <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">星图共链</span>
+                    </div>
+                    
+                    <!-- 桌面导航菜单 -->
+                    <nav class="hidden md:flex items-center space-x-8">
+                        <a href="index.html" class="font-medium hover:text-primary transition-colors duration-200">首页</a>
+                        <a href="index.html#features" class="font-medium hover:text-primary transition-colors duration-200">功能模块</a>
+                        <a href="index.html#showcase" class="font-medium hover:text-primary transition-colors duration-200">数字藏品</a>
+                        <a href="index.html#about" class="font-medium hover:text-primary transition-colors duration-200">关于我们</a>
+                    </nav>
+                    
+                    <!-- 用户操作区 -->
+                    <div class="flex items-center space-x-4">
+                        <button class="hidden md:flex items-center px-4 py-2 rounded-full border border-primary text-primary hover:bg-primary/5 transition-colors duration-200">
+                            <i class="fa fa-search mr-2"></i>
+                            <span>搜索</span>
+                        </button>
+                        <div class="relative">
+                            <button class="flex items-center space-x-2 px-4 py-2 rounded-full bg-primary text-white hover:bg-primary/90 transition-colors duration-200">
+                                <div class="w-8 h-8 rounded-full overflow-hidden">
+                                    <img src="https://picsum.photos/id/1005/100/100" alt="用户头像" class="w-full h-full object-cover">
+                                </div>
+                                <span class="hidden md:inline">张晓明</span>
+                                <i class="fa fa-angle-down"></i>
+                            </button>
+                            
+                            <!-- 用户下拉菜单 -->
+                            <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-10 hidden" id="user-menu">
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fa fa-user-circle mr-2"></i>个人资料
+                                </a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fa fa-cog mr-2"></i>账户设置
+                                </a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fa fa-question-circle mr-2"></i>帮助中心
+                                </a>
+                                <div class="border-t border-gray-100 my-1"></div>
+                                <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+                                    <i class="fa fa-sign-out mr-2"></i>退出登录
+                                </a>
+                            </div>
+                        </div>
+                        <!-- 移动端菜单按钮 -->
+                        <button id="mobile-menu-button" class="md:hidden text-gray-600 hover:text-primary">
+                            <i class="fa fa-bars text-2xl"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 移动端菜单 -->
+        <div id="mobile-menu" class="md:hidden hidden bg-white border-b border-gray-200">
+            <div class="container mx-auto px-4 py-3">
+                <nav class="flex flex-col space-y-3">
+                    <a href="index.html" class="font-medium hover:text-primary transition-colors duration-200 py-2">首页</a>
+                    <a href="index.html#features" class="font-medium hover:text-primary transition-colors duration-200 py-2">功能模块</a>
+                    <a href="index.html#showcase" class="font-medium hover:text-primary transition-colors duration-200 py-2">数字藏品</a>
+                    <a href="index.html#about" class="font-medium hover:text-primary transition-colors duration-200 py-2">关于我们</a>
+                    <div class="border-t border-gray-100 my-1"></div>
+                    <a href="#" class="font-medium hover:text-primary transition-colors duration-200 py-2">
+                        <i class="fa fa-user-circle mr-2"></i>个人资料
+                    </a>
+                    <a href="#" class="font-medium hover:text-primary transition-colors duration-200 py-2">
+                        <i class="fa fa-cog mr-2"></i>账户设置
+                    </a>
+                    <a href="#" class="font-medium hover:text-primary transition-colors duration-200 py-2">
+                        <i class="fa fa-question-circle mr-2"></i>帮助中心
+                    </a>
+                    <a href="#" class="font-medium text-red-600 hover:text-red-700 transition-colors duration-200 py-2">
+                        <i class="fa fa-sign-out mr-2"></i>退出登录
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="container mx-auto px-4 pt-24 pb-16">
+        <!-- 页面标题 -->
+        <div class="mb-8 text-center">
+            <h1 class="text-[clamp(1.8rem,5vw,3rem)] font-bold text-dark mb-2">用户共创</h1>
+            <p class="text-gray-600 max-w-2xl mx-auto">与其他用户共同创作数字文化资产，融合多元创意，传承文化遗产，创造独一无二的数字艺术品</p>
+        </div>
+
+        <!-- 操作按钮区 -->
+        <div class="mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <h2 class="text-xl font-bold">共创项目</h2>
+                <p class="text-gray-600">探索和参与由平台用户发起的共创项目，发挥你的创意，共同打造精彩的数字文化作品</p>
+            </div>
+            <button id="create-project" class="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors flex items-center shadow-md">
+                <i class="fa fa-plus-circle mr-2"></i>
+                <span>创建共创项目</span>
+            </button>
+        </div>
+
+        <!-- 共创统计卡片 -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-xl shadow-sm p-6 card-hover">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">总项目数</p>
+                        <h3 class="text-3xl font-bold mt-1">42</h3>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                        <i class="fa fa-th text-xl"></i>
+                    </div>
+                </div>
+                <div class="mt-4 w-full bg-gray-200 rounded-full h-1.5">
+                    <div class="bg-primary h-1.5 rounded-full" style="width: 75%"></div>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">较上月增长 <span class="text-green-600 font-medium">+28%</span></p>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm p-6 card-hover">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">进行中项目</p>
+                        <h3 class="text-3xl font-bold mt-1">18</h3>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
+                        <i class="fa fa-spinner text-xl"></i>
+                    </div>
+                </div>
+                <div class="mt-4 w-full bg-gray-200 rounded-full h-1.5">
+                    <div class="bg-secondary h-1.5 rounded-full" style="width: 42%"></div>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">参与率 <span class="text-green-600 font-medium">65%</span></p>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm p-6 card-hover">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">参与用户</p>
+                        <h3 class="text-3xl font-bold mt-1">326</h3>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center text-accent">
+                        <i class="fa fa-users text-xl"></i>
+                    </div>
+                </div>
+                <div class="mt-4 w-full bg-gray-200 rounded-full h-1.5">
+                    <div class="bg-accent h-1.5 rounded-full" style="width: 60%"></div>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">较上月 <span class="text-green-600 font-medium">+41%</span></p>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm p-6 card-hover">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">完成项目</p>
+                        <h3 class="text-3xl font-bold mt-1">24</h3>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-800">
+                        <i class="fa fa-check-circle text-xl"></i>
+                    </div>
+                </div>
+                <div class="mt-4 w-full bg-gray-200 rounded-full h-1.5">
+                    <div class="bg-green-500 h-1.5 rounded-full" style="width: 55%"></div>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">完成率 <span class="text-green-600 font-medium">57%</span></p>
+            </div>
+        </div>
+
+        <!-- 数据可视化 -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-xl shadow-sm p-6 lg:col-span-2">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-bold">项目类型分布</h3>
+                    <div class="flex space-x-2">
+                        <button class="px-3 py-1 text-sm bg-primary text-white rounded-lg">月</button>
+                        <button class="px-3 py-1 text-sm bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200">季</button>
+                        <button class="px-3 py-1 text-sm bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200">年</button>
+                    </div>
+                </div>
+                <div class="h-80">
+                    <canvas id="projectTypeChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-bold">参与度统计</h3>
+                    <button class="text-gray-400 hover:text-gray-600">
+                        <i class="fa fa-ellipsis-v"></i>
+                    </button>
+                </div>
+                <div class="h-80">
+                    <canvas id="participationChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- 项目筛选区 -->
+        <div class="bg-white rounded-xl shadow-sm p-5 mb-8">
+            <div class="flex flex-col sm:flex-row gap-4">
+                <div class="relative flex-grow">
+                    <input type="text" placeholder="搜索共创项目..." class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all">
+                    <i class="fa fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                </div>
+                <div class="flex gap-3 flex-wrap">
+                    <select class="px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all">
+                        <option>所有类型</option>
+                        <option>数字绘画</option>
+                        <option>3D模型</option>
+                        <option>动画视频</option>
+                        <option>音频作品</option>
+                        <option>文本内容</option>
+                    </select>
+                    <select class="px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all">
+                        <option>所有状态</option>
+                        <option>招募中</option>
+                        <option>创作中</option>
+                        <option>已完成</option>
+                        <option>已结束</option>
+                    </select>
+                    <select class="px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all">
+                        <option>推荐项目</option>
+                        <option>最新发布</option>
+                        <option>最多参与</option>
+                        <option>即将结束</option>
+                    </select>
+                </div>
+                <button class="px-5 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                    <i class="fa fa-filter mr-2"></i>筛选
+                </button>
+            </div>
+        </div>
+
+        <!-- 热门标签 -->
+        <div class="mb-8">
+            <h3 class="font-medium mb-3">热门标签</h3>
+            <div class="flex flex-wrap gap-2">
+                <button class="px-4 py-1.5 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors">
+                    敦煌文化
+                </button>
+                <button class="px-4 py-1.5 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
+                    故宫文物
+                </button>
+                <button class="px-4 py-1.5 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
+                    传统工艺
+                </button>
+                <button class="px-4 py-1.5 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
+                    数字艺术
+                </button>
+                <button class="px-4 py-1.5 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
+                    3D建模
+                </button>
+                <button class="px-4 py-1.5 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
+                    动画创作
+                </button>
+                <button class="px-4 py-1.5 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
+                    声音设计
+                </button>
+                <button class="px-4 py-1.5 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
+                    文学创作
+                </button>
+            </div>
+        </div>
+
+        <!-- 共创项目网格 -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <!-- 项目卡片1 -->
+            <div class="card-hover bg-white rounded-xl shadow-sm overflow-hidden">
+                <div class="relative h-48">
+                    <img src="https://picsum.photos/id/1015/600/400" alt="敦煌飞天共创项目" class="w-full h-full object-cover">
+                    <div class="absolute top-3 left-3">
+                        <span class="px-3 py-1 rounded-full text-xs font-medium status-recruiting">
+                            招募中
+                        </span>
+                    </div>
+                    <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent text-white">
+                        <div class="flex justify-between items-end">
+                            <div>
+                                <h3 class="font-semibold text-lg">敦煌飞天数字艺术共创</h3>
+                                <p class="text-sm opacity-90">已有 32 人参与</p>
+                            </div>
+                            <span class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs">
+                                剩余 12 天
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-5">
+                    <div class="flex items-center mb-4">
+                        <div class="w-8 h-8 rounded-full overflow-hidden mr-2">
+                            <img src="https://picsum.photos/id/1005/100/100" alt="发起者头像" class="w-full h-full object-cover">
+                        </div>
+                        <span class="text-sm text-gray-600">发起者: 张晓明</span>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4 line-clamp-2">
+                        以敦煌飞天为主题，邀请数字艺术家共同创作系列数字插画，融合传统壁画元素与现代数字艺术风格。
+                    </p>
+                    <div class="mb-4">
+                        <div class="flex justify-between text-xs text-gray-500 mb-1">
+                            <span>参与进度</span>
+                            <span>32/50 人</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-primary" style="width: 64%"></div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="fa fa-comment-o mr-1"></i> 24
+                            <span class="mx-2">|</span>
+                            <i class="fa fa-heart-o mr-1"></i> 48
+                        </div>
+                        <button class="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary/90 transition-colors">
+                            立即参与
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 项目卡片2 -->
+            <div class="card-hover bg-white rounded-xl shadow-sm overflow-hidden">
+                <div class="relative h-48">
+                    <img src="https://picsum.photos/id/1035/600/400" alt="故宫文物3D共创" class="w-full h-full object-cover">
+                    <div class="absolute top-3 left-3">
+                        <span class="px-3 py-1 rounded-full text-xs font-medium status-creating">
+                            创作中
+                        </span>
+                    </div>
+                    <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent text-white">
+                        <div class="flex justify-between items-end">
+                            <div>
+                                <h3 class="font-semibold text-lg">故宫文物3D模型共创</h3>
+                                <p class="text-sm opacity-90">已有 46 人参与</p>
+                            </div>
+                            <span class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs">
+                                剩余 25 天
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-5">
+                    <div class="flex items-center mb-4">
+                        <div class="w-8 h-8 rounded-full overflow-hidden mr-2">
+                            <img src="https://picsum.photos/id/1012/100/100" alt="发起者头像" class="w-full h-full object-cover">
+                        </div>
+                        <span class="text-sm text-gray-600">发起者: 李艺术</span>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4 line-clamp-2">
+                        基于故宫馆藏文物，共同创建高精度3D模型，用于数字展览和虚拟体验，传承文化遗产。
+                    </p>
+                    <div class="mb-4">
+                        <div class="flex justify-between text-xs text-gray-500 mb-1">
+                            <span>参与进度</span>
+                            <span>46/60 人</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-secondary" style="width: 77%"></div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="fa fa-comment-o mr-1"></i> 56
+                            <span class="mx-2">|</span>
+                            <i class="fa fa-heart-o mr-1"></i> 72
+                        </div>
+                        <button class="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary/90 transition-colors">
+                            立即参与
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 项目卡片3 -->
+            <div class="card-hover bg-white rounded-xl shadow-sm overflow-hidden">
+                <div class="relative h-48">
+                    <img src="https://picsum.photos/id/1040/600/400" alt="兵马俑动画共创" class="w-full h-full object-cover">
+                    <div class="absolute top-3 left-3">
+                        <span class="px-3 py-1 rounded-full text-xs font-medium status-recruiting">
+                            招募中
+                        </span>
+                    </div>
+                    <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent text-white">
+                        <div class="flex justify-between items-end">
+                            <div>
+                                <h3 class="font-semibold text-lg">兵马俑主题动画共创</h3>
+                                <p class="text-sm opacity-90">已有 18 人参与</p>
+                            </div>
+                            <span class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs">
+                                剩余 30 天
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-5">
+                    <div class="flex items-center mb-4">
+                        <div class="w-8 h-8 rounded-full overflow-hidden mr-2">
+                            <img src="https://picsum.photos/id/1025/100/100" alt="发起者头像" class="w-full h-full object-cover">
+                        </div>
+                        <span class="text-sm text-gray-600">发起者: 王科技</span>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4 line-clamp-2">
+                        创作以兵马俑为主题的动画短片，讲述古代军事文化故事，欢迎动画师、编剧等参与。
+                    </p>
+                    <div class="mb-4">
+                        <div class="flex justify-between text-xs text-gray-500 mb-1">
+                            <span>参与进度</span>
+                            <span>18/40 人</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-accent" style="width: 45%"></div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="fa fa-comment-o mr-1"></i> 32
+                            <span class="mx-2">|</span>
+                            <i class="fa fa-heart-o mr-1"></i> 56
+                        </div>
+                        <button class="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary/90 transition-colors">
+                            立即参与
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 项目卡片4 -->
+            <div class="card-hover bg-white rounded-xl shadow-sm overflow-hidden">
+                <div class="relative h-48">
+                    <img src="https://picsum.photos/id/1050/600/400" alt="敦煌文化研究共创" class="w-full h-full object-cover">
+                    <div class="absolute top-3 left-3">
+                        <span class="px-3 py-1 rounded-full text-xs font-medium status-completed">
+                            已完成
+                        </span>
+                    </div>
+                    <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent text-white">
+                        <div class="flex justify-between items-end">
+                            <div>
+                                <h3 class="font-semibold text-lg">敦煌文化研究报告共创</h3>
+                                <p class="text-sm opacity-90">52 人参与完成</p>
+                            </div>
+                            <span class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs">
+                                已完成
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-5">
+                    <div class="flex items-center mb-4">
+                        <div class="w-8 h-8 rounded-full overflow-hidden mr-2">
+                            <img src="https://picsum.photos/id/1062/100/100" alt="发起者头像" class="w-full h-full object-cover">
+                        </div>
+                        <span class="text-sm text-gray-600">发起者: 陈教授</span>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4 line-clamp-2">
+                        集合历史、艺术、数字技术等领域专家，共同完成敦煌文化数字化保护研究报告。
+                    </p>
+                    <div class="mb-4">
+                        <div class="flex justify-between text-xs text-gray-500 mb-1">
+                            <span>参与进度</span>
+                            <span>52/52 人</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-green-500" style="width: 100%"></div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="fa fa-comment-o mr-1"></i> 89
+                            <span class="mx-2">|</span>
+                            <i class="fa fa-heart-o mr-1"></i> 126
+                        </div>
+                        <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm hover:bg-gray-300 transition-colors">
+                            查看成果
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 项目卡片5 -->
+            <div class="card-hover bg-white rounded-xl shadow-sm overflow-hidden">
+                <div class="relative h-48">
+                    <img src="https://picsum.photos/id/1060/600/400" alt="青铜器音效共创" class="w-full h-full object-cover">
+                    <div class="absolute top-3 left-3">
+                        <span class="px-3 py-1 rounded-full text-xs font-medium status-ended">
+                            已结束
+                        </span>
+                    </div>
+                    <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent text-white">
+                        <div class="flex justify-between items-end">
+                            <div>
+                                <h3 class="font-semibold text-lg">青铜器音效素材共创</h3>
+                                <p class="text-sm opacity-90">36 人参与完成</p>
+                            </div>
+                            <span class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs">
+                                已结束
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-5">
+                    <div class="flex items-center mb-4">
+                        <div class="w-8 h-8 rounded-full overflow-hidden mr-2">
+                            <img src="https://picsum.photos/id/1074/100/100" alt="发起者头像" class="w-full h-full object-cover">
+                        </div>
+                        <span class="text-sm text-gray-600">发起者: 林声音</span>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4 line-clamp-2">
+                        采集和创作青铜器相关的数字音效素材，为文化类数字作品提供音频支持。
+                    </p>
+                    <div class="mb-4">
+                        <div class="flex justify-between text-xs text-gray-500 mb-1">
+                            <span>参与进度</span>
+                            <span>36/36 人</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-yellow-500" style="width: 100%"></div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="fa fa-comment-o mr-1"></i> 45
+                            <span class="mx-2">|</span>
+                            <i class="fa fa-heart-o mr-1"></i> 68
+                        </div>
+                        <button class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm hover:bg-gray-300 transition-colors">
+                            查看成果
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 项目卡片6 -->
+            <div class="card-hover bg-white rounded-xl shadow-sm overflow-hidden">
+                <div class="relative h-48">
+                    <img src="https://picsum.photos/id/1070/600/400" alt="传统纹样数字创作" class="w-full h-full object-cover">
+                    <div class="absolute top-3 left-3">
+                        <span class="px-3 py-1 rounded-full text-xs font-medium status-recruiting">
+                            招募中
+                        </span>
+                    </div>
+                    <div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent text-white">
+                        <div class="flex justify-between items-end">
+                            <div>
+                                <h3 class="font-semibold text-lg">传统纹样数字创作共创</h3>
+                                <p class="text-sm opacity-90">已有 24 人参与</p>
+                            </div>
+                            <span class="bg-white/20 backdrop-blur-sm px-3 py-1 rounded-full text-xs">
+                                剩余 18 天
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-5">
+                    <div class="flex items-center mb-4">
+                        <div class="w-8 h-8 rounded-full overflow-hidden mr-2">
+                            <img src="https://picsum.photos/id/1083/100/100" alt="发起者头像" class="w-full h-full object-cover">
+                        </div>
+                        <span class="text-sm text-gray-600">发起者: 赵设计</span>
+                    </div>
+                    <p class="text-gray-600 text-sm mb-4 line-clamp-2">
+                        重新设计传统纹样，创造适合现代数字应用的图案素材，用于数字藏品和文创产品。
+                    </p>
+                    <div class="mb-4">
+                        <div class="flex justify-between text-xs text-gray-500 mb-1">
+                            <span>参与进度</span>
+                            <span>24/40 人</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill bg-primary" style="width: 60%"></div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="fa fa-comment-o mr-1"></i> 36
+                            <span class="mx-2">|</span>
+                            <i class="fa fa-heart-o mr-1"></i> 52
+                        </div>
+                        <button class="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary/90 transition-colors">
+                            立即参与
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 分页 -->
+        <div class="flex justify-center">
+            <div class="flex space-x-2">
+                <button class="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 disabled:opacity-50" disabled>
+                    <i class="fa fa-chevron-left"></i>
+                </button>
+                <button class="w-10 h-10 rounded-lg bg-primary text-white flex items-center justify-center">1</button>
+                <button class="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center text-gray-700 hover:bg-gray-50">2</button>
+                <button class="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center text-gray-700 hover:bg-gray-50">3</button>
+                <button class="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center text-gray-700 hover:bg-gray-50">4</button>
+                <button class="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center text-gray-700 hover:bg-gray-50">5</button>
+                <button class="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50">
+                    <i class="fa fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- 共创指南 -->
+        <div class="bg-white rounded-xl shadow-sm p-6 mt-12">
+            <h2 class="text-xl font-bold mb-6 text-center">如何参与共创项目</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="text-center">
+                    <div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary text-2xl mx-auto mb-4">
+                        <i class="fa fa-search"></i>
+                    </div>
+                    <h3 class="font-semibold text-lg mb-3">浏览项目</h3>
+                    <p class="text-gray-600">在共创项目列表中浏览感兴趣的项目，查看项目详情、参与要求和进度。</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary text-2xl mx-auto mb-4">
+                        <i class="fa fa-hand-o-right"></i>
+                    </div>
+                    <h3 class="font-semibold text-lg mb-3">申请参与</h3>
+                    <p class="text-gray-600">点击"立即参与"按钮，提交参与申请，等待项目发起者审核。</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary text-2xl mx-auto mb-4">
+                        <i class="fa fa-paint-brush"></i>
+                    </div>
+                    <h3 class="font-semibold text-lg mb-3">贡献创意</h3>
+                    <p class="text-gray-600">通过平台协作工具提交你的创意和作品，与其他参与者共同创作。</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white pt-16 pb-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+                <div>
+                    <div class="flex items-center space-x-2 mb-6">
+                        <div class="w-10 h-10 rounded-lg gradient-bg from-primary to-secondary flex items-center justify-center">
+                            <i class="fa fa-link text-white text-xl"></i>
+                        </div>
+                        <span class="text-xl font-bold">星图共链</span>
+                    </div>
+                    <p class="text-gray-400 mb-6">利用区块链技术，为文化遗产创造数字资产新生态，让每一件文化瑰宝都能在数字世界中永存。</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary transition-colors duration-200">
+                            <i class="fa fa-weibo"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary transition-colors duration-200">
+                            <i class="fa fa-wechat"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary transition-colors duration-200">
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary transition-colors duration-200">
+                            <i class="fa fa-instagram"></i>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-6">快速链接</h4>
+                    <ul class="space-y-4">
+                        <li><a href="index.html" class="text-gray-400 hover:text-white transition-colors duration-200">首页</a></li>
+                        <li><a href="index.html#features" class="text-gray-400 hover:text-white transition-colors duration-200">功能模块</a></li>
+                        <li><a href="index.html#showcase" class="text-gray-400 hover:text-white transition-colors duration-200">数字藏品</a></li>
+                        <li><a href="index.html#about" class="text-gray-400 hover:text-white transition-colors duration-200">关于我们</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">联系我们</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-6">功能模块</h4>
+                    <ul class="space-y-4">
+                        <li><a href="user_management.html" class="text-gray-400 hover:text-white transition-colors duration-200">用户管理</a></li>
+                        <li><a href="copyright_records.html" class="text-gray-400 hover:text-white transition-colors duration-200">版权存证</a></li>
+                        <li><a href="marketplace.html" class="text-gray-400 hover:text-white transition-colors duration-200">数字资产交易</a></li>
+                        <li><a href="collaboration_workshop.html" class="text-gray-400 hover:text-white transition-colors duration-200">用户共创</a></li>
+                        <li><a href="royalty_dashboard.html" class="text-gray-400 hover:text-white transition-colors duration-200">收益分配</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-6">帮助中心</h4>
+                    <ul class="space-y-4">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">常见问题</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">使用教程</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">隐私政策</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">服务条款</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">联系客服</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 pt-8">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <p class="text-gray-500 text-sm mb-4 md:mb-0">© 2023 星图共链. 保留所有权利.</p>
+                    <div class="flex space-x-6">
+                        <a href="#" class="text-gray-500 hover:text-white text-sm transition-colors duration-200">隐私政策</a>
+                        <a href="#" class="text-gray-500 hover:text-white text-sm transition-colors duration-200">服务条款</a>
+                        <a href="#" class="text-gray-500 hover:text-white text-sm transition-colors duration-200">Cookie 政策</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 创建项目模态框 -->
+    <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden" id="create-project-modal">
+        <div class="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="text-xl font-bold">创建共创项目</h3>
+                <button id="close-create-project-modal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <form id="create-project-form" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="project-name" class="block text-sm font-medium text-gray-700 mb-2">项目名称</label>
+                            <input type="text" id="project-name" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all" placeholder="输入项目名称">
+                        </div>
+                        <div>
+                            <label for="project-type" class="block text-sm font-medium text-gray-700 mb-2">项目类型</label>
+                            <select id="project-type" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all">
+                                <option>选择项目类型</option>
+                                <option>数字绘画</option>
+                                <option>3D模型</option>
+                                <option>动画视频</option>
+                                <option>音频作品</option>
+                                <option>文本内容</option>
+                                <option>其他</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="project-category" class="block text-sm font-medium text-gray-700 mb-2">文化类别</label>
+                        <select id="project-category" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all">
+                            <option>选择文化类别</option>
+                            <option>敦煌文化</option>
+                            <option>故宫文物</option>
+                            <option>兵马俑</option>
+                            <option>传统工艺</option>
+                            <option>古典文学</option>
+                            <option>其他</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label for="project-description" class="block text-sm font-medium text-gray-700 mb-2">项目描述</label>
+                        <textarea id="project-description" rows="4" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all" placeholder="详细描述你的共创项目..."></textarea>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label for="project-cover" class="block text-sm font-medium text-gray-700 mb-2">项目封面</label>
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-colors cursor-pointer">
+                                <div class="mb-4">
+                                    <i class="fa fa-image text-4xl text-gray-400 mb-2"></i>
+                                    <p class="text-gray-500 mb-2">点击或拖拽图片到此处</p>
+                                    <p class="text-xs text-gray-400">推荐尺寸: 1200x600px，支持 JPG、PNG 格式</p>
+                                </div>
+                                <button type="button" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200 transition-colors">
+                                    上传图片
+                                </button>
+                                <input type="file" class="hidden">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label for="project-participants" class="block text-sm font-medium text-gray-700 mb-2">预计参与人数</label>
+                            <input type="number" id="project-participants" min="2" max="100" value="10" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all">
+                        </div>
+                        
+                        <div>
+                            <label for="project-days" class="block text-sm font-medium text-gray-700 mb-2">项目周期(天)</label>
+                            <input type="number" id="project-days" min="7" max="180" value="30" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">参与要求</label>
+                        <div class="space-y-3">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary">
+                                <span class="ml-2 text-gray-700">需要审核参与者</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary">
+                                <span class="ml-2 text-gray-700">限制专业领域</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary">
+                                <span class="ml-2 text-gray-700">需要提交作品集</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="project-tags" class="block text-sm font-medium text-gray-700 mb-2">项目标签</label>
+                        <input type="text" id="project-tags" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all" placeholder="输入标签，用逗号分隔">
+                        <p class="text-xs text-gray-500 mt-2">例如: 敦煌, 数字艺术, 插画</p>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-4">
+                        <button type="button" id="cancel-create-project" class="px-6 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">取消</button>
+                        <button type="submit" class="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">创建项目</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 项目详情模态框 -->
+    <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden" id="project-details-modal">
+        <div class="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="text-xl font-bold">项目详情</h3>
+                <button id="close-project-details-modal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <div class="relative h-64 mb-6">
+                    <img src="https://picsum.photos/id/1015/800/400" alt="项目封面" class="w-full h-full object-cover rounded-xl">
+                    <div class="absolute top-4 right-4">
+                        <span class="px-3 py-1 rounded-full text-xs font-medium status-recruiting">
+                            招募中
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="flex flex-col md:flex-row gap-6 mb-8">
+                    <div class="w-full md:w-2/3">
+                        <h2 class="text-2xl font-bold mb-2">敦煌飞天数字艺术共创</h2>
+                        <div class="flex items-center text-gray-500 text-sm mb-4">
+                            <span class="flex items-center mr-4">
+                                <i class="fa fa-user mr-1"></i> 发起者: 张晓明
+                            </span>
+                            <span class="flex items-center mr-4">
+                                <i class="fa fa-calendar mr-1"></i> 项目周期: 45 天
+                            </span>
+                            <span class="flex items-center">
+                                <i class="fa fa-users mr-1"></i> 已参与: 32/50 人
+                            </span>
+                        </div>
+                        <p class="text-gray-700 mb-6">
+                            以敦煌飞天为主题，邀请数字艺术家共同创作系列数字插画，融合传统壁画元素与现代数字艺术风格。项目将最终生成一组高质量数字艺术作品，用于数字展览和文化推广。参与者需具备数字绘画或插画创作经验，提交相关作品集供审核。
+                        </p>
+                        
+                        <div class="bg-gray-50 rounded-xl p-5 mb-6">
+                            <h4 class="font-semibold mb-4">项目阶段</h4>
+                            <div class="space-y-4">
+                                <div>
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="text-sm font-medium">参与者招募</span>
+                                        <span class="text-sm text-gray-500">剩余 12 天</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-primary h-2 rounded-full" style="width: 60%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="text-sm font-medium">创意构思</span>
+                                        <span class="text-sm text-gray-500">开始于 2025-06-22</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-primary h-2 rounded-full" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="text-sm font-medium">创作执行</span>
+                                        <span class="text-sm text-gray-500">开始于 2025-07-05</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-primary h-2 rounded-full" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="text-sm font-medium">成果整合</span>
+                                        <span class="text-sm text-gray-500">开始于 2025-08-01</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-2">
+                                        <div class="bg-primary h-2 rounded-full" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-50 rounded-xl p-5 mb-6">
+                            <h4 class="font-semibold mb-4">参与要求</h4>
+                            <ul class="space-y-3 text-gray-700">
+                                <li class="flex items-start">
+                                    <i class="fa fa-check text-green-500 mt-1 mr-2"></i>
+                                    <span>具备数字绘画或插画创作经验，有相关作品案例</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-check text-green-500 mt-1 mr-2"></i>
+                                    <span>熟悉敦煌文化元素，理解传统壁画艺术风格</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-check text-green-500 mt-1 mr-2"></i>
+                                    <span>能够按时完成创作任务，遵守项目时间安排</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-check text-green-500 mt-1 mr-2"></i>
+                                    <span>同意项目成果的版权分配方案</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="w-full md:w-1/3">
+                        <div class="bg-gray-50 rounded-xl p-5 sticky top-24">
+                            <div class="flex items-center mb-4">
+                                <div class="w-12 h-12 rounded-full overflow-hidden mr-3">
+                                    <img src="https://picsum.photos/id/1005/100/100" alt="发起者头像" class="w-full h-full object-cover">
+                                </div>
+                                <div>
+                                    <h4 class="font-medium">张晓明</h4>
+                                    <p class="text-sm text-gray-500">数字艺术家</p>
+                                </div>
+                            </div>
+                            
+                            <div class="border-t border-gray-200 my-4 pt-4">
+                                <h4 class="font-medium mb-3">项目数据</h4>
+                                <div class="space-y-3">
+                                    <div>
+                                        <div class="flex justify-between text-sm text-gray-500 mb-1">
+                                            <span>浏览量</span>
+                                            <span>428</span>
+                                        </div>
+                                        <div class="w-full bg-gray-200 rounded-full h-1.5">
+                                            <div class="bg-primary h-1.5 rounded-full" style="width: 85%"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-sm text-gray-500 mb-1">
+                                            <span>收藏数</span>
+                                            <span>126</span>
+                                        </div>
+                                        <div class="w-full bg-gray-200 rounded-full h-1.5">
+                                            <div class="bg-primary h-1.5 rounded-full" style="width: 60%"></div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="flex justify-between text-sm text-gray-500 mb-1">
+                                            <span>申请参与</span>
+                                            <span>48</span>
+                                        </div>
+                                        <div class="w-full bg-gray-200 rounded-full h-1.5">
+                                            <div class="bg-primary h-1.5 rounded-full" style="width: 75%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="border-t border-gray-200 my-4 pt-4">
+                                <h4 class="font-medium mb-3">参与方式</h4>
+                                <button class="w-full py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors mb-3">
+                                    立即申请参与
+                                </button>
+                                <button class="w-full py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                                    <i class="fa fa-heart-o mr-2"></i> 收藏项目
+                                </button>
+                            </div>
+                            
+                            <div class="border-t border-gray-200 my-4 pt-4">
+                                <h4 class="font-medium mb-3">项目标签</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="px-3 py-1 rounded-full bg-primary/10 text-primary text-sm">敦煌文化</span>
+                                    <span class="px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-sm">数字艺术</span>
+                                    <span class="px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-sm">插画</span>
+                                    <span class="px-3 py-1 rounded-full bg-gray-100 text-gray-700 text-sm">共创</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 rounded-xl p-5 mb-8">
+                    <h4 class="font-semibold mb-4">参与者列表</h4>
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-full overflow-hidden mr-3">
+                                <img src="https://picsum.photos/id/1012/100/100" alt="参与者头像" class="w-full h-full object-cover">
+                            </div>
+                            <div class="flex-grow">
+                                <h5 class="font-medium">李艺术</h5>
+                                <p class="text-xs text-gray-500">数字插画师</p>
+                            </div>
+                            <span class="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-800">已确认</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-full overflow-hidden mr-3">
+                                <img src="https://picsum.photos/id/1025/100/100" alt="参与者头像" class="w-full h-full object-cover">
+                            </div>
+                            <div class="flex-grow">
+                                <h5 class="font-medium">王科技</h5>
+                                <p class="text-xs text-gray-500">3D建模师</p>
+                            </div>
+                            <span class="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-800">已确认</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-full overflow-hidden mr-3">
+                                <img src="https://picsum.photos/id/1062/100/100" alt="参与者头像" class="w-full h-full object-cover">
+                            </div>
+                            <div class="flex-grow">
+                                <h5 class="font-medium">陈教授</h5>
+                                <p class="text-xs text-gray-500">敦煌文化研究员</p>
+                            </div>
+                            <span class="text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800">待确认</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-full overflow-hidden mr-3">
+                                <img src="https://picsum.photos/id/1074/100/100" alt="参与者头像" class="w-full h-full object-cover">
+                            </div>
+                            <div class="flex-grow">
+                                <h5 class="font-medium">林声音</h5>
+                                <p class="text-xs text-gray-500">音频设计师</p>
+                            </div>
+                            <span class="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-800">已确认</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-full overflow-hidden mr-3">
+                                <img src="https://picsum.photos/id/1083/100/100" alt="参与者头像" class="w-full h-full object-cover">
+                            </div>
+                            <div class="flex-grow">
+                                <h5 class="font-medium">赵设计</h5>
+                                <p class="text-xs text-gray-500">UI设计师</p>
+                            </div>
+                            <span class="text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800">待确认</span>
+                        </div>
+                    </div>
+                    <button class="w-full mt-4 text-sm text-primary hover:text-primary/80 transition-colors">
+                        查看全部 32 位参与者
+                    </button>
+                </div>
+                
+                <div class="bg-gray-50 rounded-xl p-5">
+                    <h4 class="font-semibold mb-4">讨论区</h4>
+                    <div class="space-y-4 mb-6">
+                        <div class="border-b border-gray-200 pb-4">
+                            <div class="flex items-start">
+                                <div class="w-10 h-10 rounded-full overflow-hidden mr-3">
+                                    <img src="https://picsum.photos/id/1012/100/100" alt="评论者头像" class="w-full h-full object-cover">
+                                </div>
+                                <div class="flex-grow">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <h5 class="font-medium">李艺术</h5>
+                                        <span class="text-xs text-gray-500">2天前</span>
+                                    </div>
+                                    <p class="text-gray-700 text-sm mb-2">我对敦煌飞天的服饰细节很感兴趣，请问是否有参考资料可以分享？</p>
+                                    <div class="flex items-center space-x-4 text-sm">
+                                        <button class="text-gray-500 hover:text-primary transition-colors">
+                                            <i class="fa fa-thumbs-o-up mr-1"></i> 12
+                                        </button>
+                                        <button class="text-gray-500 hover:text-primary transition-colors">
+                                            <i class="fa fa-reply mr-1"></i> 回复
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="mt-4 ml-10">
+                                        <div class="flex items-start">
+                                            <div class="w-8 h-8 rounded-full overflow-hidden mr-3">
+                                                <img src="https://picsum.photos/id/1005/100/100" alt="回复者头像" class="w-full h-full object-cover">
+                                            </div>
+                                            <div class="flex-grow">
+                                                <div class="flex justify-between items-center mb-1">
+                                                    <h5 class="font-medium">张晓明</h5>
+                                                    <span class="text-xs text-gray-500">1天前</span>
+                                                </div>
+                                                <p class="text-gray-700 text-sm">
+                                                    我准备了一批敦煌研究院的资料，包括壁画高清图和服饰细节解析，会在项目开始后分享给所有参与者。
+                                                </p>
+                                                <div class="flex items-center space-x-4 text-sm mt-2">
+                                                    <button class="text-gray-500 hover:text-primary transition-colors">
+                                                        <i class="fa fa-thumbs-o-up mr-1"></i> 8
+                                                    </button>
+                                                    <button class="text-gray-500 hover:text-primary transition-colors">
+                                                        <i class="fa fa-reply mr-1"></i> 回复
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="border-b border-gray-200 pb-4">
+                            <div class="flex items-start">
+                                <div class="w-10 h-10 rounded-full overflow-hidden mr-3">
+                                    <img src="https://picsum.photos/id/1025/100/100" alt="评论者头像" class="w-full h-full object-cover">
+                                </div>
+                                <div class="flex-grow">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <h5 class="font-medium">王科技</h5>
+                                        <span class="text-xs text-gray-500">3天前</span>
+                                    </div>
+                                    <p class="text-gray-700 text-sm mb-2">
+                                        我在考虑是否可以将3D建模技术应用到这个项目中，创建可交互的飞天模型，大家有什么想法？
+                                    </p>
+                                    <div class="flex items-center space-x-4 text-sm">
+                                        <button class="text-gray-500 hover:text-primary transition-colors">
+                                            <i class="fa fa-thumbs-o-up mr-1"></i> 24
+                                        </button>
+                                        <button class="text-gray-500 hover:text-primary transition-colors">
+                                            <i class="fa fa-reply mr-1"></i> 回复
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex items-start">
+                                <div class="w-10 h-10 rounded-full overflow-hidden mr-3">
+                                    <img src="https://picsum.photos/id/1074/100/100" alt="评论者头像" class="w-full h-full object-cover">
+                                </div>
+                                <div class="flex-grow">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <h5 class="font-medium">林声音</h5>
+                                        <span class="text-xs text-gray-500">4天前</span>
+                                    </div>
+                                    <p class="text-gray-700 text-sm mb-2">
+                                        我是做音频设计的，如果项目需要为作品添加音效或背景音乐，可以联系我，我很乐意贡献专业技能。
+                                    </p>
+                                    <div class="flex items-center space-x-4 text-sm">
+                                        <button class="text-gray-500 hover:text-primary transition-colors">
+                                            <i class="fa fa-thumbs-o-up mr-1"></i> 15
+                                        </button>
+                                        <button class="text-gray-500 hover:text-primary transition-colors">
+                                            <i class="fa fa-reply mr-1"></i> 回复
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h5 class="font-medium mb-3">发表评论</h5>
+                        <div class="flex">
+                            <div class="w-10 h-10 rounded-full overflow-hidden mr-3 flex-shrink-0">
+                                <img src="https://picsum.photos/id/1005/100/100" alt="当前用户头像" class="w-full h-full object-cover">
+                            </div>
+                            <div class="flex-grow">
+                                <textarea class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all" rows="3" placeholder="分享你的想法..."></textarea>
+                                <div class="flex justify-end mt-3">
+                                    <button class="px-4 py-2 bg-primary text-white rounded-lg text-sm hover:bg-primary/90 transition-colors">
+                                        发布评论
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 参与项目模态框 -->
+    <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden" id="join-project-modal">
+        <div class="bg-white rounded-2xl w-full max-w-2xl">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="text-xl font-bold">申请参与项目</h3>
+                <button id="close-join-project-modal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <div class="flex items-center mb-6">
+                    <div class="w-16 h-16 rounded-xl overflow-hidden mr-4">
+                        <img src="https://picsum.photos/id/1015/200/200" alt="项目封面" class="w-full h-full object-cover">
+                    </div>
+                    <div>
+                        <h4 class="font-semibold">敦煌飞天数字艺术共创</h4>
+                        <p class="text-sm text-gray-500">发起者: 张晓明</p>
+                    </div>
+                </div>
+                
+                <form id="join-project-form" class="space-y-6">
+                    <div>
+                        <label for="join-message" class="block text-sm font-medium text-gray-700 mb-2">自我介绍</label>
+                        <textarea id="join-message" rows="4" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all" placeholder="请简要介绍你的相关经验和为什么想参与这个项目..."></textarea>
+                    </div>
+                    
+                    <div>
+                        <label for="portfolio-link" class="block text-sm font-medium text-gray-700 mb-2">作品集链接</label>
+                        <input type="url" id="portfolio-link" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all" placeholder="请提供你的作品集链接（选填）">
+                    </div>
+                    
+                    <div>
+                        <label for="join-skills" class="block text-sm font-medium text-gray-700 mb-2">你的技能</label>
+                        <select id="join-skills" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all">
+                            <option>选择你的专业技能</option>
+                            <option>数字绘画</option>
+                            <option>3D建模</option>
+                            <option>动画制作</option>
+                            <option>UI/UX设计</option>
+                            <option>音频设计</option>
+                            <option>文案创作</option>
+                            <option>项目管理</option>
+                            <option>其他</option>
+                        </select>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <input type="checkbox" id="join-agreement" class="mt-1 mr-3">
+                        <label for="join-agreement" class="text-sm text-gray-600">
+                            我已阅读并同意<a href="#" class="text-primary hover:underline">《共创项目参与协议》</a>和<a href="#" class="text-primary hover:underline">《版权归属声明》</a>
+                        </label>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-4">
+                        <button type="button" id="cancel-join-project" class="px-6 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">取消</button>
+                        <button type="submit" class="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">提交申请</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 成功提交申请模态框 -->
+    <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden" id="success-modal">
+        <div class="bg-white rounded-2xl w-full max-w-md text-center p-8">
+            <div class="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center text-green-500 mx-auto mb-6">
+                <i class="fa fa-check text-3xl"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-2">申请已提交</h3>
+            <p class="text-gray-600 mb-6">
+                你的参与申请已成功提交，项目发起者将在3个工作日内审核并回复你。
+            </p>
+            <button id="close-success-modal" class="w-full py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                确认
+            </button>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // 导航栏滚动效果
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 10) {
+                navbar.classList.add('bg-white', 'shadow-md');
+                navbar.classList.remove('glass-effect');
+            } else {
+                navbar.classList.remove('bg-white', 'shadow-md');
+                navbar.classList.add('glass-effect');
+            }
+        });
+
+        // 移动端菜单切换
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // 用户下拉菜单
+        const userMenu = document.getElementById('user-menu');
+        const userButton = document.querySelector('.flex.items-center.space-x-2.px-4.py-2.rounded-full.bg-primary');
+        
+        userButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userMenu.classList.toggle('hidden');
+        });
+        
+        document.addEventListener('click', () => {
+            userMenu.classList.add('hidden');
+        });
+
+        // 模态框控制
+        const createProjectButton = document.getElementById('create-project');
+        const createProjectModal = document.getElementById('create-project-modal');
+        const closeCreateProjectModal = document.getElementById('close-create-project-modal');
+        const cancelCreateProject = document.getElementById('cancel-create-project');
+        const createProjectForm = document.getElementById('create-project-form');
+        
+        createProjectButton.addEventListener('click', () => {
+            createProjectModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        });
+        
+        function closeCreateProject() {
+            createProjectModal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            createProjectForm.reset();
+        }
+        
+        closeCreateProjectModal.addEventListener('click', closeCreateProject);
+        cancelCreateProject.addEventListener('click', closeCreateProject);
+        
+        // 项目详情模态框
+        const projectCards = document.querySelectorAll('.card-hover');
+        const projectDetailsModal = document.getElementById('project-details-modal');
+        const closeProjectDetailsModal = document.getElementById('close-project-details-modal');
+        
+        projectCards.forEach(card => {
+            card.addEventListener('click', () => {
+                projectDetailsModal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            });
+        });
+        
+        closeProjectDetailsModal.addEventListener('click', () => {
+            projectDetailsModal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        });
+        
+        // 参与项目模态框
+        const joinProjectButtons = document.querySelectorAll('button:contains("立即参与")');
+        const joinProjectModal = document.getElementById('join-project-modal');
+        const closeJoinProjectModal = document.getElementById('close-join-project-modal');
+        const cancelJoinProject = document.getElementById('cancel-join-project');
+        
+        joinProjectButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                joinProjectModal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            });
+        });
+        
+        function closeJoinProject() {
+            joinProjectModal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+        
+        closeJoinProjectModal.addEventListener('click', closeJoinProject);
+        cancelJoinProject.addEventListener('click', closeJoinProject);
+        
+        // 成功提交申请模态框
+        const joinProjectForm = document.getElementById('join-project-form');
+        const successModal = document.getElementById('success-modal');
+        const closeSuccessModal = document.getElementById('close-success-modal');
+        
+        joinProjectForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            joinProjectModal.classList.add('hidden');
+            successModal.classList.remove('hidden');
+        });
+        
+        closeSuccessModal.addEventListener('click', () => {
+            successModal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+            joinProjectForm.reset();
+        });
+        
+        // 表单提交处理
+        createProjectForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            // 模拟创建项目操作
+            alert('项目创建成功！');
+            closeCreateProject();
+        });
+        
+        // 初始化图表
+        window.addEventListener('load', () => {
+            // 项目类型分布图表
+            const projectTypeCtx = document.getElementById('projectTypeChart').getContext('2d');
+            const projectTypeChart = new Chart(projectTypeCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['数字绘画', '3D模型', '动画视频', '音频作品', '文本内容', '其他'],
+                    datasets: [{
+                        label: '项目数量',
+                        data: [18, 12, 6, 4, 10, 2],
+                        backgroundColor: [
+                            'rgba(106, 17, 203, 0.7)',
+                            'rgba(37, 117, 252, 0.7)',
+                            'rgba(52, 211, 153, 0.7)',
+                            'rgba(168, 85, 247, 0.7)',
+                            'rgba(245, 158, 11, 0.7)',
+                            'rgba(236, 72, 153, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(106, 17, 203, 1)',
+                            'rgba(37, 117, 252, 1)',
+                            'rgba(52, 211, 153, 1)',
+                            'rgba(168, 85, 247, 1)',
+                            'rgba(245, 158, 11, 1)',
+                            'rgba(236, 72, 153, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // 参与度统计图表
+            const participationCtx = document.getElementById('participationChart').getContext('2d');
+            const participationChart = new Chart(participationCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['招募中', '创作中', '已完成', '已结束'],
+                    datasets: [{
+                        data: [18, 12, 10, 2],
+                        backgroundColor: [
+                            'rgba(106, 17, 203, 0.7)',
+                            'rgba(37, 117, 252, 0.7)',
+                            'rgba(52, 211, 153, 0.7)',
+                            'rgba(245, 158, 11, 0.7)'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '65%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        }
+                    }
+                }
+            });
+        });
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                    
+                    // 如果是移动端，点击后关闭菜单
+                    if (!mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                }
+            });
+        });
+
+        // 页面加载动画
+        document.addEventListener('DOMContentLoaded', () => {
+            document.body.classList.add('fade-in');
+        });
+    </script>
+</body>
+</html>
