@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星图共链 - 数字市场</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind 配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6a11cb',
+                        secondary: '#2575fc',
+                        accent: '#34d399',
+                        dark: '#1e293b',
+                        light: '#f8fafc'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <!-- 自定义工具类 -->
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .gradient-bg {
+                background: linear-gradient(135deg, var(--tw-gradient-stops));
+            }
+            .card-hover {
+                transition: all 0.3s ease;
+            }
+            .card-hover:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            .glass-effect {
+                backdrop-filter: blur(10px);
+                background-color: rgba(255, 255, 255, 0.7);
+            }
+            .animate-float {
+                animation: float 6s ease-in-out infinite;
+            }
+            @keyframes float {
+                0% { transform: translateY(0px); }
+                50% { transform: translateY(-10px); }
+                100% { transform: translateY(0px); }
+            }
+        }
+    </style>
+    
+    <style>
+        /* 全局样式 */
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+        
+        /* 动画效果 */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
+        
+        /* 资产卡片悬停效果 */
+        .asset-card {
+            transition: all 0.3s ease;
+        }
+        
+        .asset-card:hover {
+            transform: translateY(-8px);
+        }
+        
+        .asset-card:hover .card-overlay {
+            opacity: 1;
+        }
+        
+        .card-overlay {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);
+        }
+        
+        /* 加载动画 */
+        .loader {
+            border-top-color: #6a11cb;
+            animation: spinner 0.6s linear infinite;
+        }
+        
+        @keyframes spinner {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-inter">
+    <!-- 顶部导航栏 -->
+    <header id="navbar" class="fixed w-full top-0 z-50 transition-all duration-300">
+        <div class="glass-effect border-b border-gray-200">
+            <div class="container mx-auto px-4 py-3">
+                <div class="flex items-center justify-between">
+                    <!-- Logo -->
+                    <div class="flex items-center space-x-2">
+                        <div class="w-10 h-10 rounded-lg gradient-bg from-primary to-secondary flex items-center justify-center">
+                            <i class="fa fa-link text-white text-xl"></i>
+                        </div>
+                        <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">星图共链</span>
+                    </div>
+                    
+                    <!-- 桌面导航菜单 -->
+                    <nav class="hidden md:flex items-center space-x-8">
+                        <a href="index.html" class="font-medium hover:text-primary transition-colors duration-200">首页</a>
+                        <a href="index.html#features" class="font-medium hover:text-primary transition-colors duration-200">功能模块</a>
+                        <a href="index.html#showcase" class="font-medium hover:text-primary transition-colors duration-200">数字藏品</a>
+                        <a href="index.html#about" class="font-medium hover:text-primary transition-colors duration-200">关于我们</a>
+                    </nav>
+                    
+                    <!-- 用户操作区 -->
+                    <div class="flex items-center space-x-4">
+                        <button class="hidden md:flex items-center px-4 py-2 rounded-full border border-primary text-primary hover:bg-primary/5 transition-colors duration-200">
+                            <i class="fa fa-search mr-2"></i>
+                            <span>搜索</span>
+                        </button>
+                        <div class="relative">
+                            <button class="flex items-center space-x-2 px-4 py-2 rounded-full bg-primary text-white hover:bg-primary/90 transition-colors duration-200">
+                                <div class="w-8 h-8 rounded-full overflow-hidden">
+                                    <img src="https://picsum.photos/id/1005/100/100" alt="用户头像" class="w-full h-full object-cover">
+                                </div>
+                                <span class="hidden md:inline">张晓明</span>
+                                <i class="fa fa-angle-down"></i>
+                            </button>
+                            
+                            <!-- 用户下拉菜单 -->
+                            <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-10 hidden" id="user-menu">
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fa fa-user-circle mr-2"></i>个人资料
+                                </a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fa fa-cog mr-2"></i>账户设置
+                                </a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fa fa-question-circle mr-2"></i>帮助中心
+                                </a>
+                                <div class="border-t border-gray-100 my-1"></div>
+                                <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+                                    <i class="fa fa-sign-out mr-2"></i>退出登录
+                                </a>
+                            </div>
+                        </div>
+                        <!-- 移动端菜单按钮 -->
+                        <button id="mobile-menu-button" class="md:hidden text-gray-600 hover:text-primary">
+                            <i class="fa fa-bars text-2xl"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 移动端菜单 -->
+        <div id="mobile-menu" class="md:hidden hidden bg-white border-b border-gray-200">
+            <div class="container mx-auto px-4 py-3">
+                <nav class="flex flex-col space-y-3">
+                    <a href="index.html" class="font-medium hover:text-primary transition-colors duration-200 py-2">首页</a>
+                    <a href="index.html#features" class="font-medium hover:text-primary transition-colors duration-200 py-2">功能模块</a>
+                    <a href="index.html#showcase" class="font-medium hover:text-primary transition-colors duration-200 py-2">数字藏品</a>
+                    <a href="index.html#about" class="font-medium hover:text-primary transition-colors duration-200 py-2">关于我们</a>
+                    <div class="border-t border-gray-100 my-1"></div>
+                    <a href="#" class="font-medium hover:text-primary transition-colors duration-200 py-2">
+                        <i class="fa fa-user-circle mr-2"></i>个人资料
+                    </a>
+                    <a href="#" class="font-medium hover:text-primary transition-colors duration-200 py-2">
+                        <i class="fa fa-cog mr-2"></i>账户设置
+                    </a>
+                    <a href="#" class="font-medium hover:text-primary transition-colors duration-200 py-2">
+                        <i class="fa fa-question-circle mr-2"></i>帮助中心
+                    </a>
+                    <a href="#" class="font-medium text-red-600 hover:text-red-700 transition-colors duration-200 py-2">
+                        <i class="fa fa-sign-out mr-2"></i>退出登录
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="container mx-auto px-4 pt-24 pb-16">
+        <!-- 页面标题 -->
+        <div class="mb-8 text-center">
+            <h1 class="text-[clamp(1.8rem,5vw,3rem)] font-bold text-dark mb-2">数字市场</h1>
+            <p class="text-gray-600 max-w-2xl mx-auto">探索和交易由文化遗产与艺术创作融合而成的独特数字资产，每一件都是区块链技术保护的独一无二的存在</p>
+        </div>
+
+        <!-- 内容区布局 -->
+        <div class="flex flex-col lg:flex-row gap-6">
+            <!-- 侧边栏 -->
+            <aside class="lg:w-1/5">
+                <div class="bg-white rounded-xl shadow-sm p-5 sticky top-24">
+                    <h3 class="font-semibold text-lg mb-4 flex items-center">
+                        <i class="fa fa-filter text-primary mr-2"></i>
+                        筛选条件
+                    </h3>
+                    
+                    <!-- 价格范围 -->
+                    <div class="mb-6">
+                        <h4 class="font-medium mb-3">价格范围</h4>
+                        <div class="px-2">
+                            <input type="range" min="0" max="100000" value="50000" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary" id="priceRange">
+                            <div class="flex justify-between text-sm text-gray-500 mt-1">
+                                <span>¥0</span>
+                                <span id="priceValue">¥50,000</span>
+                                <span>¥100,000+</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 分类 -->
+                    <div class="mb-6">
+                        <h4 class="font-medium mb-3">分类</h4>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary">
+                                <span class="ml-2">数字绘画</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary">
+                                <span class="ml-2">3D模型</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary">
+                                <span class="ml-2">动画视频</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary">
+                                <span class="ml-2">音频作品</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary">
+                                <span class="ml-2">文本内容</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- 来源博物馆 -->
+                    <div class="mb-6">
+                        <h4 class="font-medium mb-3">来源博物馆</h4>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary">
+                                <span class="ml-2">故宫博物院</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary">
+                                <span class="ml-2">敦煌研究院</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary">
+                                <span class="ml-2">秦始皇陵博物院</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary">
+                                <span class="ml-2">三星堆博物馆</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary">
+                                <span class="ml-2">上海博物馆</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- 排序方式 -->
+                    <div class="mb-6">
+                        <h4 class="font-medium mb-3">排序方式</h4>
+                        <select class="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none">
+                            <option>最新上架</option>
+                            <option>价格从低到高</option>
+                            <option>价格从高到低</option>
+                            <option>热门推荐</option>
+                            <option>最多收藏</option>
+                        </select>
+                    </div>
+                    
+                    <!-- 筛选按钮 -->
+                    <div class="flex space-x-3">
+                        <button class="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                            应用筛选
+                        </button>
+                        <button class="px-4 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                            重置
+                        </button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- 主内容 -->
+            <div class="lg:w-4/5">
+                <!-- 搜索和筛选区 -->
+                <div class="bg-white rounded-xl shadow-sm p-5 mb-6">
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <div class="relative flex-grow">
+                            <input type="text" placeholder="搜索数字资产..." class="w-full pl-10 pr-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all">
+                            <i class="fa fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        </div>
+                        <div class="flex gap-3">
+                            <select class="px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all">
+                                <option>所有类别</option>
+                                <option>数字绘画</option>
+                                <option>3D模型</option>
+                                <option>动画视频</option>
+                                <option>音频作品</option>
+                                <option>文本内容</option>
+                            </select>
+                            <select class="px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all">
+                                <option>所有状态</option>
+                                <option>可购买</option>
+                                <option>拍卖中</option>
+                                <option>已售出</option>
+                            </select>
+                        </div>
+                        <button class="px-5 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                            <i class="fa fa-search mr-2"></i>搜索
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 热门标签 -->
+                <div class="mb-6">
+                    <h3 class="font-medium mb-3">热门标签</h3>
+                    <div class="flex flex-wrap gap-2">
+                        <button class="px-4 py-1.5 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors">
+                            敦煌壁画
+                        </button>
+                        <button class="px-4 py-1.5 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
+                            故宫文物
+                        </button>
+                        <button class="px-4 py-1.5 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
+                            兵马俑
+                        </button>
+                        <button class="px-4 py-1.5 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
+                            三星堆
+                        </button>
+                        <button class="px-4 py-1.5 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
+                            青花瓷
+                        </button>
+                        <button class="px-4 py-1.5 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
+                            数字艺术
+                        </button>
+                        <button class="px-4 py-1.5 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
+                            3D模型
+                        </button>
+                        <button class="px-4 py-1.5 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors">
+                            动画
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 数字资产网格 -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- 资产卡片1 -->
+                    <div class="asset-card bg-white rounded-xl shadow-sm overflow-hidden">
+                        <div class="relative h-64">
+                            <img src="https://picsum.photos/id/1015/500/500" alt="敦煌飞天数字插画" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 card-overlay flex flex-col justify-end p-4">
+                                <div class="flex justify-between items-center">
+                                    <button class="w-9 h-9 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors">
+                                        <i class="fa fa-heart-o"></i>
+                                    </button>
+                                    <button class="w-9 h-9 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors">
+                                        <i class="fa fa-share-alt"></i>
+                                    </button>
+                                </div>
+                                <button class="mt-2 w-full py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                                    立即购买
+                                </button>
+                            </div>
+                            <div class="absolute top-3 left-3">
+                                <span class="px-3 py-1 rounded-full text-xs font-medium bg-green-500 text-white">可购买</span>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-semibold text-lg">敦煌飞天数字插画</h3>
+                                <span class="font-bold text-primary">¥2,499</span>
+                            </div>
+                            <div class="flex items-center mb-3">
+                                <div class="w-8 h-8 rounded-full overflow-hidden mr-2">
+                                    <img src="https://picsum.photos/id/1005/100/100" alt="创作者头像" class="w-full h-full object-cover">
+                                </div>
+                                <span class="text-sm text-gray-600">张晓明</span>
+                            </div>
+                            <div class="flex justify-between items-center text-sm text-gray-500">
+                                <span>
+                                    <i class="fa fa-eye mr-1"></i> 248
+                                </span>
+                                <span>
+                                    <i class="fa fa-heart mr-1"></i> 124
+                                </span>
+                                <span>
+                                    <i class="fa fa-clock-o mr-1"></i> 3天前
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 资产卡片2 -->
+                    <div class="asset-card bg-white rounded-xl shadow-sm overflow-hidden">
+                        <div class="relative h-64">
+                            <img src="https://picsum.photos/id/1035/500/500" alt="故宫青花瓷3D模型" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 card-overlay flex flex-col justify-end p-4">
+                                <div class="flex justify-between items-center">
+                                    <button class="w-9 h-9 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors">
+                                        <i class="fa fa-heart-o"></i>
+                                    </button>
+                                    <button class="w-9 h-9 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors">
+                                        <i class="fa fa-share-alt"></i>
+                                    </button>
+                                </div>
+                                <button class="mt-2 w-full py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                                    立即购买
+                                </button>
+                            </div>
+                            <div class="absolute top-3 left-3">
+                                <span class="px-3 py-1 rounded-full text-xs font-medium bg-green-500 text-white">可购买</span>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-semibold text-lg">故宫青花瓷3D模型</h3>
+                                <span class="font-bold text-primary">¥3,999</span>
+                            </div>
+                            <div class="flex items-center mb-3">
+                                <div class="w-8 h-8 rounded-full overflow-hidden mr-2">
+                                    <img src="https://picsum.photos/id/1012/100/100" alt="创作者头像" class="w-full h-full object-cover">
+                                </div>
+                                <span class="text-sm text-gray-600">李艺术</span>
+                            </div>
+                            <div class="flex justify-between items-center text-sm text-gray-500">
+                                <span>
+                                    <i class="fa fa-eye mr-1"></i> 186
+                                </span>
+                                <span>
+                                    <i class="fa fa-heart mr-1"></i> 89
+                                </span>
+                                <span>
+                                    <i class="fa fa-clock-o mr-1"></i> 5天前
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 资产卡片3 -->
+                    <div class="asset-card bg-white rounded-xl shadow-sm overflow-hidden">
+                        <div class="relative h-64">
+                            <img src="https://picsum.photos/id/1040/500/500" alt="兵马俑将军像动画" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 card-overlay flex flex-col justify-end p-4">
+                                <div class="flex justify-between items-center">
+                                    <button class="w-9 h-9 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors">
+                                        <i class="fa fa-heart-o"></i>
+                                    </button>
+                                    <button class="w-9 h-9 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors">
+                                        <i class="fa fa-share-alt"></i>
+                                    </button>
+                                </div>
+                                <button class="mt-2 w-full py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                                    立即购买
+                                </button>
+                            </div>
+                            <div class="absolute top-3 left-3">
+                                <span class="px-3 py-1 rounded-full text-xs font-medium bg-yellow-500 text-white">拍卖中</span>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-semibold text-lg">兵马俑将军像动画</h3>
+                                <span class="font-bold text-primary">¥1,899</span>
+                            </div>
+                            <div class="flex items-center mb-3">
+                                <div class="w-8 h-8 rounded-full overflow-hidden mr-2">
+                                    <img src="https://picsum.photos/id/1025/100/100" alt="创作者头像" class="w-full h-full object-cover">
+                                </div>
+                                <span class="text-sm text-gray-600">王科技</span>
+                            </div>
+                            <div class="flex justify-between items-center text-sm text-gray-500">
+                                <span>
+                                    <i class="fa fa-eye mr-1"></i> 312
+                                </span>
+                                <span>
+                                    <i class="fa fa-heart mr-1"></i> 156
+                                </span>
+                                <span>
+                                    <i class="fa fa-clock-o mr-1"></i> 1周前
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 资产卡片4 -->
+                    <div class="asset-card bg-white rounded-xl shadow-sm overflow-hidden">
+                        <div class="relative h-64">
+                            <img src="https://picsum.photos/id/1050/500/500" alt="敦煌文化研究报告" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 card-overlay flex flex-col justify-end p-4">
+                                <div class="flex justify-between items-center">
+                                    <button class="w-9 h-9 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors">
+                                        <i class="fa fa-heart-o"></i>
+                                    </button>
+                                    <button class="w-9 h-9 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors">
+                                        <i class="fa fa-share-alt"></i>
+                                    </button>
+                                </div>
+                                <button class="mt-2 w-full py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                                    立即购买
+                                </button>
+                            </div>
+                            <div class="absolute top-3 left-3">
+                                <span class="px-3 py-1 rounded-full text-xs font-medium bg-green-500 text-white">可购买</span>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-semibold text-lg">敦煌文化研究报告</h3>
+                                <span class="font-bold text-primary">¥2,899</span>
+                            </div>
+                            <div class="flex items-center mb-3">
+                                <div class="w-8 h-8 rounded-full overflow-hidden mr-2">
+                                    <img src="https://picsum.photos/id/1062/100/100" alt="创作者头像" class="w-full h-full object-cover">
+                                </div>
+                                <span class="text-sm text-gray-600">陈教授</span>
+                            </div>
+                            <div class="flex justify-between items-center text-sm text-gray-500">
+                                <span>
+                                    <i class="fa fa-eye mr-1"></i> 156
+                                </span>
+                                <span>
+                                    <i class="fa fa-heart mr-1"></i> 72
+                                </span>
+                                <span>
+                                    <i class="fa fa-clock-o mr-1"></i> 2周前
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 资产卡片5 -->
+                    <div class="asset-card bg-white rounded-xl shadow-sm overflow-hidden">
+                        <div class="relative h-64">
+                            <img src="https://picsum.photos/id/1060/500/500" alt="青铜器音效素材" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 card-overlay flex flex-col justify-end p-4">
+                                <div class="flex justify-between items-center">
+                                    <button class="w-9 h-9 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors">
+                                        <i class="fa fa-heart-o"></i>
+                                    </button>
+                                    <button class="w-9 h-9 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/30 transition-colors">
+                                        <i class="fa fa-share-alt"></i>
+                                    </button>
+                                </div>
+                                <button class="mt-2 w-full py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                                    立即购买
+                                </button>
+                            </div>
+                            <div class="absolute top-3 left-3">
+                                <span class="px-3 py-1 rounded-full text-xs font-medium bg-green-500 text-white">可购买</span>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="font-semibold text-lg">青铜器音效素材</h3>
+                                <span class="font-bold text-primary">¥1,299</span>
+                            </div>
+                            <div class="flex items-center mb-3">
+                                <div class="w-8 h-8 rounded-full overflow-hidden mr-2">
+                                    <img src="https://picsum.photos/id/1074/100/100" alt="创作者头像" class="w-full h-full object-cover">
+                                </div>
+                                <span class="text-sm text-gray-600">林声音</span>
+                            </div>
+                            <div class="flex justify-between items-center text-sm text-gray-500">
+                                <span>
+                                    <i class="fa fa-eye mr-1"></i> 124
+                                </span>
+                                <span>
+                                    <i class="fa fa-heart mr-1"></i> 64
+                                </span>
+                                <span>
+                                    <i class="fa fa-clock-o mr-1"></i> 3周前
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 资产
