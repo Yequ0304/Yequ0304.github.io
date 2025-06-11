@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星图共链 - 数字艺术共创平台</title>
+    <!-- 引入Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- 引入Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    
+    <!-- Tailwind配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6A11CB',
+                        secondary: '#2575FC',
+                        accent: '#34D399',
+                        dark: '#1F2937',
+                        light: '#F9FAFB'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <!-- 自定义工具类 -->
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .glass-effect {
+                background: rgba(255, 255, 255, 0.8);
+                backdrop-filter: blur(10px);
+            }
+            .text-gradient {
+                background-clip: text;
+                -webkit-background-clip: text;
+                color: transparent;
+            }
+            .card-hover {
+                transition: all 0.3s ease;
+            }
+            .card-hover:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px -5px rgba(106, 17, 203, 0.1), 0 10px 10px -5px rgba(106, 17, 203, 0.04);
+            }
+            .fade-in {
+                animation: fadeIn 0.5s ease-in-out;
+            }
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        }
+    </style>
+</head>
+<body class="font-inter bg-gray-50 text-gray-800 min-h-screen">
+    <!-- 导航栏 -->
+    <header id="navbar" class="fixed w-full top-0 z-40 glass-effect transition-all duration-300">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex items-center justify-between">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <a href="#" class="flex items-center">
+                        <div class="w-10 h-10 rounded-lg bg-gradient-to-r from-primary to-secondary flex items-center justify-center text-white mr-2">
+                            <i class="fa fa-star-o text-xl"></i>
+                        </div>
+                        <span class="text-xl font-bold bg-gradient-to-r from-primary to-secondary text-gradient">星图共链</span>
+                    </a>
+                    
+                    <!-- 桌面端导航 -->
+                    <nav class="hidden md:flex ml-10 space-x-8">
+                        <a href="#projects" class="text-primary font-medium hover:text-primary/80 transition-colors">发现项目</a>
+                        <a href="#create" class="text-gray-600 font-medium hover:text-primary transition-colors">创建项目</a>
+                        <a href="#about" class="text-gray-600 font-medium hover:text-primary transition-colors">关于我们</a>
+                        <a href="#faq" class="text-gray-600 font-medium hover:text-primary transition-colors">常见问题</a>
+                    </nav>
+                </div>
+                
+                <!-- 右侧功能区 -->
+                <div class="flex items-center space-x-4">
+                    <button class="hidden md:block px-4 py-2 rounded-lg border border-primary text-primary hover:bg-primary/5 transition-colors">
+                        <i class="fa fa-search mr-2"></i>搜索
+                    </button>
+                    <button id="create-project" class="hidden md:flex items-center px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors">
+                        <i class="fa fa-plus mr-2"></i>创建项目
+                    </button>
+                    
+                    <!-- 用户头像和下拉菜单 -->
+                    <div class="relative">
+                        <button class="flex items-center space-x-2 px-4 py-2 rounded-full bg-primary text-white hover:bg-primary/90 transition-colors">
+                            <img src="https://picsum.photos/id/1005/100/100" alt="用户头像" class="w-8 h-8 rounded-full object-cover">
+                            <span class="hidden md:inline">张晓明</span>
+                        </button>
+                        
+                        <div id="user-menu" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-50 hidden">
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fa fa-user-o mr-2"></i>个人主页
+                            </a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fa fa-star-o mr-2"></i>我的项目
+                            </a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fa fa-bell-o mr-2"></i>通知
+                            </a>
+                            <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                <i class="fa fa-cog mr-2"></i>设置
+                            </a>
+                            <div class="border-t border-gray-100 my-1"></div>
+                            <a href="#" class="block px-4 py-2 text-sm text-red-500 hover:bg-gray-100">
+                                <i class="fa fa-sign-out mr-2"></i>退出登录
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- 移动端菜单按钮 -->
+                    <button id="mobile-menu-button" class="md:hidden flex items-center">
+                        <i class="fa fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 移动端菜单 -->
+            <div id="mobile-menu" class="md:hidden hidden mt-4 pb-4">
+                <div class="flex items-center mb-4">
+                    <button class="flex-1 px-4 py-2 rounded-lg border border-primary text-primary">
+                        <i class="fa fa-search mr-2"></i>搜索
+                    </button>
+                </div>
+                <nav class="flex flex-col space-y-3">
+                    <a href="#projects" class="px-4 py-2 rounded-lg bg-primary/5 text-primary font-medium">发现项目</a>
+                    <a href="#create" class="px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-600 font-medium">创建项目</a>
+                    <a href="#about" class="px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-600 font-medium">关于我们</a>
+                    <a href="#faq" class="px-4 py-2 rounded-lg hover:bg-gray-100 text-gray-600 font-medium">常见问题</a>
+                </nav>
+                <div class="mt-4 pt-4 border-t border-gray-100">
+                    <button id="mobile-create-project" class="w-full flex items-center justify-center px-4 py-2 rounded-lg bg-primary text-white">
+                        <i class="fa fa-plus mr-2"></i>创建项目
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主要内容 -->
+    <main class="container mx-auto px-4 pt-24 pb-16">
+        <!-- 欢迎横幅 -->
+        <section class="relative overflow-hidden rounded-2xl mb-12 mt-4">
+            <div class="absolute inset-0 bg-gradient-to-r from-primary/90 to-secondary/90 z-10"></div>
+            <img src="https://picsum.photos/id/1015/1600/400" alt="数字艺术共创背景" class="absolute inset-0 w-full h-full object-cover">
+            <div class="relative z-20 px-8 py-12 md:py-20 md:px-16">
+                <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold text-white mb-4">
+                    共创数字艺术<br>共享创意价值
+                </h1>
+                <p class="text-[clamp(1rem,2vw,1.25rem)] text-white/90 max-w-2xl mb-8">
+                    星图共链平台连接全球创作者，共同打造、分享和受益于数字艺术作品，让每一份创意都能绽放价值。
+                </p>
+                <div class="flex flex-wrap gap-4">
+                    <button class="px-6 py-3 bg-white text-primary rounded-lg font-medium hover:bg-gray-100 transition-colors">
+                        探索热门项目
+                    </button>
+                    <button class="px-6 py-3 bg-transparent border border-white text-white rounded-lg font-medium hover:bg-white/10 transition-colors">
+                        了解收益模式
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 数据统计 -->
+        <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            <div class="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">总项目数</p>
+                        <h3 class="text-3xl font-bold mt-1">42</h3>
+                        <p class="text-green-500 text-sm mt-2">
+                            <i class="fa fa-arrow-up mr-1"></i> 12% 较上月
+                        </p>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                        <i class="fa fa-th-large text-xl"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">进行中项目</p>
+                        <h3 class="text-3xl font-bold mt-1">24</h3>
+                        <p class="text-green-500 text-sm mt-2">
+                            <i class="fa fa-arrow-up mr-1"></i> 8% 较上月
+                        </p>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
+                        <i class="fa fa-spinner text-xl"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">参与用户</p>
+                        <h3 class="text-3xl font-bold mt-1">1,286</h3>
+                        <p class="text-green-500 text-sm mt-2">
+                            <i class="fa fa-arrow-up mr-1"></i> 24% 较上月
+                        </p>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center text-accent">
+                        <i class="fa fa-users text-xl"></i>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">完成项目</p>
+                        <h3 class="text-3xl font-bold mt-1">16</h3>
+                        <p class="text-green-500 text-sm mt-2">
+                            <i class="fa fa-arrow-up mr-1"></i> 18% 较上月
+                        </p>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600">
+                        <i class="fa fa-check-circle text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 收益分配模块 -->
+        <section id="revenue" class="mb-12">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+                <div>
+                    <h2 class="text-3xl font-bold mb-2">收益分配</h2>
+                    <p class="text-gray-600">透明、公平的收益分配机制，让每一位创作者获得应有的回报</p>
+                </div>
+                <div class="mt-4 md:mt-0">
+                    <div class="flex items-center space-x-2">
+                        <button class="px-4 py-2 rounded-lg bg-primary text-white hover:bg-primary/90 transition-colors">
+                            收益记录
+                        </button>
+                        <button class="px-4 py-2 rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
+                            分配规则
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 收益概览 -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm">总收益</p>
+                            <h3 class="text-3xl font-bold mt-1">¥24,580</h3>
+                            <p class="text-green-500 text-sm mt-2">
+                                <i class="fa fa-arrow-up mr-1"></i> 18% 较上月
+                            </p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                            <i class="fa fa-line-chart text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm">待结算收益</p>
+                            <h3 class="text-3xl font-bold mt-1">¥4,250</h3>
+                            <p class="text-gray-500 text-sm mt-2">
+                                预计 7月15日 结算
+                            </p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600">
+                            <i class="fa fa-clock-o text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm">已提现收益</p>
+                            <h3 class="text-3xl font-bold mt-1">¥20,330</h3>
+                            <p class="text-green-500 text-sm mt-2">
+                                <i class="fa fa-check mr-1"></i> 已全部到账
+                            </p>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+                            <i class="fa fa-credit-card text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 收益分配图表 -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                <div class="lg:col-span-2 bg-white rounded-xl p-6 shadow-sm">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="font-semibold text-lg">收益分配分析</h3>
+                        <div class="flex items-center space-x-2">
+                            <select class="text-sm px-3 py-1.5 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none">
+                                <option>近30天</option>
+                                <option>近90天</option>
+                                <option>近1年</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="h-80">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl p-6 shadow-sm">
+                    <h3 class="font-semibold text-lg mb-6">收益来源分布</h3>
+                    <div class="h-64">
+                        <canvas id="revenueSourceChart"></canvas>
+                    </div>
+                    <div class="mt-6 space-y-4">
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 rounded-full bg-primary mr-2"></div>
+                            <span class="text-sm text-gray-600">作品销售</span>
+                            <span class="ml-auto font-medium">65%</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 rounded-full bg-secondary mr-2"></div>
+                            <span class="text-sm text-gray-600">版权授权</span>
+                            <span class="ml-auto font-medium">25%</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-3 h-3 rounded-full bg-accent mr-2"></div>
+                            <span class="text-sm text-gray-600">赞助收入</span>
+                            <span class="ml-auto font-medium">10%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 收益分配记录 -->
+            <div class="bg-white rounded-xl shadow-sm">
+                <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                    <h3 class="font-semibold text-lg">收益分配记录</h3>
+                    <div class="flex items-center space-x-2">
+                        <div class="relative">
+                            <input type="text" placeholder="搜索项目..." class="text-sm pl-9 pr-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none w-48">
+                            <i class="fa fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        </div>
+                        <select class="text-sm px-3 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none">
+                            <option>全部状态</option>
+                            <option>已结算</option>
+                            <option>待结算</option>
+                            <option>已拒绝</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-gray-50">
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">项目名称</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">分配日期</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">你的角色</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">收益金额</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-100">
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="w-10 h-10 rounded-lg overflow-hidden mr-3">
+                                            <img src="https://picsum.photos/id/1015/100/100" alt="项目封面" class="w-full h-full object-cover">
+                                        </div>
+                                        <div>
+                                            <div class="font-medium">敦煌飞天数字艺术共创</div>
+                                            <div class="text-sm text-gray-500">ID: #PROJ-001</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    2023-06-15
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    项目发起人
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
+                                    ¥6,850
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        已结算
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <button class="text-primary hover:text-primary/80 mr-3">
+                                        <i class="fa fa-eye mr-1"></i>详情
+                                    </button>
+                                    <button class="text-gray-500 hover:text-gray-700">
+                                        <i class="fa fa-download"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="w-10 h-10 rounded-lg overflow-hidden mr-3">
+                                            <img src="https://picsum.photos/id/1025/100/100" alt="项目封面" class="w-full h-full object-cover">
+                                        </div>
+                                        <div>
+                                            <div class="font-medium">元宇宙城市景观设计</div>
+                                            <div class="text-sm text-gray-500">ID: #PROJ-005</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    2023-05-20
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    核心创作者
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
+                                    ¥4,250
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        已结算
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <button class="text-primary hover:text-primary/80 mr-3">
+                                        <i class="fa fa-eye mr-1"></i>详情
+                                    </button>
+                                    <button class="text-gray-500 hover:text-gray-700">
+                                        <i class="fa fa-download"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="w-10 h-10 rounded-lg overflow-hidden mr-3">
+                                            <img src="https://picsum.photos/id/1035/100/100" alt="项目封面" class="w-full h-full object-cover">
+                                        </div>
+                                        <div>
+                                            <div class="font-medium">未来科技概念插画集</div>
+                                            <div class="text-sm text-gray-500">ID: #PROJ-012</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    2023-04-10
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    贡献者
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
+                                    ¥2,800
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        已结算
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <button class="text-primary hover:text-primary/80 mr-3">
+                                        <i class="fa fa-eye mr-1"></i>详情
+                                    </button>
+                                    <button class="text-gray-500 hover:text-gray-700">
+                                        <i class="fa fa-download"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="w-10 h-10 rounded-lg overflow-hidden mr-3">
+                                            <img src="https://picsum.photos/id/1045/100/100" alt="项目封面" class="w-full h-full object-cover">
+                                        </div>
+                                        <div>
+                                            <div class="font-medium">传统文化数字藏品系列</div>
+                                            <div class="text-sm text-gray-500">ID: #PROJ-015</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    2023-03-25
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    技术支持
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
+                                    ¥3,150
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        已结算
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <button class="text-primary hover:text-primary/80 mr-3">
+                                        <i class="fa fa-eye mr-1"></i>详情
+                                    </button>
+                                    <button class="text-gray-500 hover:text-gray-700">
+                                        <i class="fa fa-download"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="w-10 h-10 rounded-lg overflow-hidden mr-3">
+                                            <img src="https://picsum.photos/id/1055/100/100" alt="项目封面" class="w-full h-full object-cover">
+                                        </div>
+                                        <div>
+                                            <div class="font-medium">AI艺术创作实验</div>
+                                            <div class="text-sm text-gray-500">ID: #PROJ-018</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    2023-07-05
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    项目发起人
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-yellow-600">
+                                    ¥4,250
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                        待结算
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <button class="text-primary hover:text-primary/80 mr-3">
+                                        <i class="fa fa-eye mr-1"></i>详情
+                                    </button>
+                                    <button class="text-gray-500 hover:text-gray-700">
+                                        <i class="fa fa-download"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="p-6 border-t border-gray-100 flex items-center justify-between">
+                    <div class="text-sm text-gray-500">
+                        显示 1 至 5 条，共 12 条记录
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-50" disabled>
+                            <i class="fa fa-chevron-left"></i>
+                        </button>
+                        <button class="w-8 h-8 flex items-center justify-center rounded-lg bg-primary text-white">
+                            1
+                        </button>
+                        <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50">
+                            2
+                        </button>
+                        <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50">
+                            3
+                        </button>
+                        <button class="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50">
+                            <i class="fa fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 项目列表 -->
+        <section id="projects" class="mb-12">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+                <div>
+                    <h2 class="text-3xl font-bold mb-2">发现项目</h2>
+                    <p class="text-gray-600">加入共创项目，贡献你的创意和技能，共同创造有价值的数字艺术作品</p>
+                </div>
+                <div class="mt-4 md:mt-0">
+                    <div class="flex items-center space-x-2">
+                        <div class="relative">
+                            <input type="text" placeholder="搜索项目..." class="text-sm pl-9 pr-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none w-48">
+                            <i class="fa fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        </div>
+                        <select class="text-sm px-3 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none">
+                            <option>全部类型</option>
+                            <option>数字绘画</option>
+                            <option>3D模型</option>
+                            <option>动画视频</option>
+                            <option>音频作品</option>
+                            <option>文本内容</option>
+                        </select>
+                        <select class="text-sm px-3 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none">
+                            <option>全部状态</option>
+                            <option>招募中</option>
+                            <option>创作中</option>
+                            <option>已完成</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 热门标签 -->
+            <div class="flex flex-wrap gap-2 mb-6">
+                <span class="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm">热门</span>
+                <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm hover:bg-gray-200 cursor-pointer transition-colors">传统文化</span>
+                <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm hover:bg-gray-200 cursor-pointer transition-colors">数字藏品</span>
+                <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm hover:bg-gray-200 cursor-pointer transition-colors">AI生成</span>
+                <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm hover:bg-gray-200 cursor-pointer transition-colors">3D建模</span>
+                <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm hover:bg-gray-200 cursor-pointer transition-colors">元宇宙</span>
+                <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm hover:bg-gray-200 cursor-pointer transition-colors">NFT</span>
+                <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm hover:bg-gray-200 cursor-pointer transition-colors">更多</span>
+            </div>
+
+            <!-- 项目卡片网格 -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- 项目卡片 1 -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-sm card-hover">
+                    <div class="relative h-48">
+                        <img src="https://picsum.photos/id/1015/400/300" alt="项目封面" class="w-full h-full object-cover">
+                        <div class="absolute top-3 left-3">
+                            <span class="px-2 py-1 bg-primary text-white text-xs rounded-lg">招募中</span>
+                        </div>
+                        <div class="absolute top-3 right-3">
+                            <button class="w-8 h-8 rounded-full bg-white/80 flex items-center justify-center text-gray-600 hover:bg-white transition-colors">
+                                <i class="fa fa-heart-o"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex items-center mb-3">
+                            <div class="w-8 h-8 rounded-full overflow-hidden mr-2">
+                                <img src="https://picsum.photos/id/1005/100/100" alt="发起人头像" class="w-full h-full object-cover">
+                            </div>
+                            <span class="text-sm text-gray-600">发起人: 张晓明</span>
+                        </div>
+                        <h3 class="font-semibold text-lg mb-2">敦煌飞天数字艺术共创</h3>
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">
+                            本项目旨在通过数字艺术形式重现敦煌壁画中的飞天形象，结合现代设计理念与传统元素，创造具有文化价值的数字艺术品。
+                        </p>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center">
+                                <div class="flex -space-x-2">
+                                    <img src="https://picsum.photos/id/1012/100/100" alt="参与者头像" class="w-8 h-8 rounded-full border-2 border-white">
+                                    <img src="https://picsum.photos/id/1025/100/100" alt="参与者头像" class="w-8 h-8 rounded-full border-2 border-white">
+                                    <img src="https://picsum.photos/id/1062/100/100" alt="参与者头像" class="w-8 h-8 rounded-full border-2 border-white">
+                                </div>
+                                <span class="text-xs text-gray-500 ml-2">+29 人参与</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="text-xs text-gray-500 mr-2">40%</span>
+                                <div class="w-16 h-2 bg-gray-100 rounded-full overflow-hidden">
+                                    <div class="h-full bg-primary rounded-full" style="width: 40%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <span class="px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full text-xs">数字绘画</span>
+                                <span class="px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full text-xs">传统文化</span>
+                            </div>
+                            <button class="text-primary hover:text-primary/80 text-sm font-medium">
+                                立即参与
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 项目卡片 2 -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-sm card-hover">
+                    <div class="relative h-48">
+                        <img src="https://picsum.photos/id/1025/400/300" alt="项目封面" class="w-full h-full object-cover">
+                        <div class="absolute top-3 left-3">
+                            <span class="px-2 py-1 bg-green-500 text-white text-xs rounded-lg">创作中</span>
+                        </div>
+                        <div class="absolute top-3 right-3">
+                            <button class="w-8 h-8 rounded-full bg-white/80 flex items-center justify-center text-gray-600 hover:bg-white transition-colors">
+                                <i class="fa fa-heart-o"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex items-center mb-3">
+                            <div class="w-8 h-8 rounded-full overflow-hidden mr-2">
+                                <img src="https://picsum.photos/id/1012/100/100" alt="发起人头像" class="w-full h-full object-cover">
+                            </div>
+                            <span class="text-sm text-gray-600">发起人: 李艺术</span>
+                        </div>
+                        <h3 class="font-semibold text-lg mb-2">元宇宙城市景观设计</h3>
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">
+                            构建一个未来主义的元宇宙城市，包含独特的建筑、景观和交互元素，为数字世界创造沉浸式体验。
+                        </p>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center">
+                                <div class="flex -space-x-2">
+                                    <img src="https://picsum.photos/id/1005/100/100" alt="参与者头像" class="w-8 h-8 rounded-full border-2 border-white">
+                                    <img src="https://picsum.photos/id/1062/100/100" alt="参与者头像" class="w-8 h-8 rounded-full border-2 border-white">
+                                    <img src="https://picsum.photos/id/1074/100/100" alt="参与者头像" class="w-8 h-8 rounded-full border-2 border-white">
+                                </div>
+                                <span class="text-xs text-gray-500 ml-2">+18 人参与</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="text-xs text-gray-500 mr-2">75%</span>
+                                <div class="w-16 h-2 bg-gray-100 rounded-full overflow-hidden">
+                                    <div class="h-full bg-primary rounded-full" style="width: 75%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <span class="px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full text-xs">3D建模</span>
+                                <span class="px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full text-xs">元宇宙</span>
+                            </div>
+                            <button class="text-primary hover:text-primary/80 text-sm font-medium">
+                                立即参与
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 项目卡片 3 -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-sm card-hover">
+                    <div class="relative h-48">
+                        <img src="https://picsum.photos/id/1035/400/300" alt="项目封面" class="w-full h-full object-cover">
+                        <div class="absolute top-3 left-3">
+                            <span class="px-2 py-1 bg-primary text-white text-xs rounded-lg">招募中</span>
+                        </div>
+                        <div class="absolute top-3 right-3">
+                            <button class="w-8 h-8 rounded-full bg-white/80 flex items-center justify-center text-red-500 hover:bg-white transition-colors">
+                                <i class="fa fa-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex items-center mb-3">
+                            <div class="w-8 h-8 rounded-full overflow-hidden mr-2">
+                                <img src="https://picsum.photos/id/1062/100/100" alt="发起人头像" class="w-full h-full object-cover">
+                            </div>
+                            <span class="text-sm text-gray-600">发起人: 陈教授</span>
+                        </div>
+                        <h3 class="font-semibold text-lg mb-2">未来科技概念插画集</h3>
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">
+                            探索未来科技与人类生活的结合，通过一系列插画作品呈现对未来世界的想象和思考。
+                        </p>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center">
+                                <div class="flex -space-x-2">
+                                    <img src="https://picsum.photos/id/1025/100/100" alt="参与者头像" class="w-8 h-8 rounded-full border-2 border-white">
+                                    <img src="https://picsum.photos/id/1074/100/100" alt="参与者头像" class="w-8 h-8 rounded-full border-2 border-white">
+                                    <img src="https://picsum.photos/id/1083/100/100" alt="参与者头像" class="w-8 h-8 rounded-full border-2 border-white">
+                                </div>
+                                <span class="text-xs text-gray-500 ml-2">+12 人参与</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="text-xs text-gray-500 mr-2">20%</span>
+                                <div class="w-16 h-2 bg-gray-100 rounded-full overflow-hidden">
+                                    <div class="h-full bg-primary rounded-full" style="width: 20%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <span class="px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full text-xs">数字绘画</span>
+                                <span class="px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full text-xs">科幻</span>
+                            </div>
+                            <button class="text-primary hover:text-primary/80 text-sm font-medium">
+                                立即参与
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 项目卡片 4 -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-sm card-hover">
+                    <div class="relative h-48">
+                        <img src="https://picsum.photos/id/1045/400/300" alt="项目封面" class="w-full h-full object-cover">
+                        <div class="absolute top-3 left-3">
+                            <span class="px-2 py-1 bg-primary text-white text-xs rounded-lg">招募中</span>
+                        </div>
+                        <div class="absolute top-3 right-3">
+                            <button class="w-8 h-8 rounded-full bg-white/80 flex items-center justify-center text-gray-600 hover:bg-white transition-colors">
+                                <i class="fa fa-heart-o"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex items-center mb-3">
+                            <div class="w-8 h-8 rounded-full overflow-hidden mr-2">
+                                <img src="https://picsum.photos/id/1074/100/100" alt="发起人头像" class="w-full h-full object-cover">
+                            </div>
+                            <span class="text-sm text-gray-600">发起人: 林声音</span>
+                        </div>
+                        <h3 class="font-semibold text-lg mb-2">传统文化数字藏品系列</h3>
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">
+                            将中国传统文化元素转化为数字藏品，通过区块链技术实现艺术作品的数字化保存和交易。
+                        </p>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center">
+                                <div class="flex -space-x-2">
+                                    <img src="https://picsum.photos/id/1005/100/100" alt="参与者头像" class="w-8 h-8 rounded-full border-2 border-white">
+                                    <img src="https://picsum.photos/id/1012/100/100" alt="参与者头像" class="w-8 h-8 rounded-full border-2 border-white">
+                                    <img src="https://picsum.photos/id/1083/100/100" alt="参与者头像" class="w-8 h-8 rounded-full border-2 border-white">
+                                </div>
+                                <span class="text-xs text-gray-500 ml-2">+24 人参与</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="text-xs text-gray-500 mr-2">35%</span>
+                                <div class="w-16 h-2 bg-gray-100 rounded-full overflow-hidden">
+                                    <div class="h-full bg-primary rounded-full" style="width: 35%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <span class="px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full text-xs">NFT</span>
+                                <span class="px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full text-xs">传统文化</span>
+                            </div>
+                            <button class="text-primary hover:text-primary/80 text-sm font-medium">
+                                立即参与
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 项目卡片 5 -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-sm card-hover">
+                    <div class="relative h-48">
+                        <img src="https://picsum.photos/id/1055/400/300" alt="项目封面" class="w-full h-full object-cover">
+                        <div class="absolute top-3 left-3">
+                            <span class="px-2 py-1 bg-green-500 text-white text-xs rounded-lg">创作中</span>
+                        </div>
+                        <div class="absolute top-3 right-3">
+                            <button class="w-8 h-8 rounded-full bg-white/80 flex items-center justify-center text-gray-600 hover:bg-white transition-colors">
+                                <i class="fa fa-heart-o"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex items-center mb-3">
+                            <div class="w-8 h-8 rounded-full overflow-hidden mr-2">
+                                <img src="https://picsum.photos/id/1083/100/100" alt="发起人头像" class="w-full h-full object-cover">
+                            </div>
+                            <span class="text-sm text-gray-600">发起人: 赵设计</span>
+                        </div>
+                        <h3 class="font-semibold text-lg mb-2">AI艺术创作实验</h3>
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">
+                            探索人工智能在艺术创作中的应用，通过AI生成艺术作品并与人类艺术家合作进行二次创作。
+                        </p>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center">
+                                <div class="flex -space-x-2">
+                                    <img src="https://picsum.photos/id/1005/100/100" alt="参与者头像" class="w-8 h-8 rounded-full border-2 border-white">
+                                    <img src="https://picsum.photos/id/1025/100/100" alt="参与者头像" class="w-8 h-8 rounded-full border-2 border-white">
+                                    <img src="https://picsum.photos/id/1062/100/100" alt="参与者头像" class="w-8 h-8 rounded-full border-2 border-white">
+                                </div>
+                                <span class="text-xs text-gray-500 ml-2">+15 人参与</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="text-xs text-gray-500 mr-2">60%</span>
+                                <div class="w-16 h-2 bg-gray-100 rounded-full overflow-hidden">
+                                    <div class="h-full bg-primary rounded-full" style="width: 60%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <span class="px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full text-xs">AI生成</span>
+                                <span class="px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full text-xs">实验艺术</span>
+                            </div>
+                            <button class="text-primary hover:text-primary/80 text-sm font-medium">
+                                立即参与
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 项目卡片 6 -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-sm card-hover">
+                    <div class="relative h-48">
+                        <img src="https://picsum.photos/id/1065/400/300" alt="项目封面" class="w-full h-full object-cover">
+                        <div class="absolute top-3 left-3">
+                            <span class="px-2 py-1 bg-gray-500 text-white text-xs rounded-lg">已完成</span>
+                        </div>
+                        <div class="absolute top-3 right-3">
+                            <button class="w-8 h-8 rounded-full bg-white/80 flex items-center justify-center text-gray-600 hover:bg-white transition-colors">
+                                <i class="fa fa-heart-o"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <div class="flex items-center mb-3">
+                            <div class="w-8 h-8 rounded-full overflow-hidden mr-2">
+                                <img src="https://picsum.photos/id/1025/100/100" alt="发起人头像" class="w-full h-full object-cover">
+                            </div>
+                            <span class="text-sm text-gray-600">发起人: 王科技</span>
+                        </div>
+                        <h3 class="font-semibold text-lg mb-2">数字敦煌石窟</h3>
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">
+                            使用3D扫描和建模技术，创建敦煌莫高窟的数字复刻版本，让更多人能够在线欣赏这一世界文化遗产。
+                        </p>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center">
+                                <div class="flex -space-x-2">
+                                    <img src="https://picsum.photos/id/1005/100/100" alt="参与者头像" class="w-8 h-8 rounded-full border-2 border-white">
+                                    <img src="https://picsum.photos/id/1012/100/100" alt="参与者头像" class="w-8 h-8 rounded-full border-2 border-white">
+                                    <img src="https://picsum.photos/id/1062/100/100" alt="参与者头像" class="w-8 h-8 rounded-full border-2 border-white">
+                                </div>
+                                <span class="text-xs text-gray-500 ml-2">+36 人参与</span>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="text-xs text-gray-500 mr-2">100%</span>
+                                <div class="w-16 h-2 bg-gray-100 rounded-full overflow-hidden">
+                                    <div class="h-full bg-primary rounded-full" style="width: 100%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <span class="px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full text-xs">3D建模</span>
+                                <span class="px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full text-xs">文化遗产</span>
+                            </div>
+                            <button class="text-primary hover:text-primary/80 text-sm font-medium">
+                                查看作品
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 加载更多按钮 -->
+            <div class="mt-10 text-center">
+                <button class="px-8 py-3 bg-white border border-gray-200 rounded-lg font-medium hover:bg-gray-50 transition-colors">
+                    加载更多项目
+                </button>
+            </div>
+        </section>
+
+        <!-- 项目详情模态框 -->
+        <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden" id="project-details-modal">
+            <div class="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+                <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                    <h3 class="text-xl font-bold">项目详情</h3>
+                    <button id="close-project-details-modal" class="text-gray-500 hover:text-gray-700">
+                        <i class="fa fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div class="p-6">
+                    <div class="mb-6">
+                        <div class="relative h-64 rounded-xl overflow-hidden">
+                            <img src="https://picsum.photos/id/1015/800/400" alt="项目封面" class="w-full h-full object-cover">
+                            <div class="absolute top-4 left-4">
+                                <span class="px-3 py-1.5 bg-primary text-white text-sm rounded-lg">招募中</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-between mt-4">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-full overflow-hidden mr-3">
+                                    <img src="https://picsum.photos/id/1005/100/100" alt="发起人头像" class="w-full h-full object-cover">
+                                </div>
+                                <div>
+                                    <h4 class="font-medium">敦煌飞天数字艺术共创</h4>
+                                    <p class="text-sm text-gray-500">发起人: 张晓明</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <button class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200 transition-colors">
+                                    <i class="fa fa-heart-o"></i>
+                                </button>
+                                <button class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200 transition-colors">
+                                    <i class="fa fa-share-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2">
+                            <div class="mb-6">
+                                <h4 class="font-semibold text-lg mb-3">项目描述</h4>
+                                <p class="text-gray-600 mb-4">
+                                    本项目旨在通过数字艺术形式重现敦煌壁画中的飞天形象，结合现代设计理念与传统元素，创造具有文化价值的数字艺术品。项目将融合多种艺术形式，包括数字绘画、3D建模、动画制作等，最终形成一套完整的数字艺术作品系列。
+                                </p>
+                                <p class="text-gray-600 mb-4">
+                                    我们希望通过这个项目，让更多人了解和欣赏敦煌文化的魅力，同时探索传统文化与现代数字技术的结合点，为文化传承和创新提供新的思路。
+                                </p>
+                                <div class="flex flex-wrap gap-2 mt-4">
+                                    <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm">传统文化</span>
+                                    <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm">数字绘画</span>
+                                    <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm">3D建模</span>
+                                    <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm">动画制作</span>
+                                    <span class="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm">数字藏品</span>
+                                </div>
+                            </div>
+
+                            <div class="mb-6">
+                                <h4 class="font-semibold text-lg mb-3">项目阶段</h4>
+                                <div class="space-y-6">
+                                    <div class="flex items-start">
+                                        <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white flex-shrink-0 mt-1">
+                                            <i class="fa fa-check"></i>
+                                        </div>
+                                        <div class="ml-4 flex-grow">
+                                            <div class="flex items-center justify-between">
+                                                <h5 class="font-medium">项目策划</h5>
+                                                <span class="text-sm text-gray-500">2023-05-01 至 2023-05-15</span>
+                                            </div>
+                                            <p class="text-sm text-gray-600 mt-1">
+                                                确定项目主题、目标和实施计划，组建核心团队，完成初步设计方案。
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white flex-shrink-0 mt-1">
+                                            <i class="fa fa-check"></i>
+                                        </div>
+                                        <div class="ml-4 flex-grow">
+                                            <div class="flex items-center justify-between">
+                                                <h5 class="font-medium">资料收集</h5>
+                                                <span class="text-sm text-gray-500">2023-05-16 至 2023-05-30</span>
+                                            </div>
+                                            <p class="text-sm text-gray-600 mt-1">
+                                                收集敦煌壁画中的飞天形象资料，进行文化研究和艺术分析，建立参考资料库。
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white flex-shrink-0 mt-1">
+                                            <i class="fa fa-check"></i>
+                                        </div>
+                                        <div class="ml-4 flex-grow">
+                                            <div class="flex items-center justify-between">
+                                                <h5 class="font-medium">设计原型</h5>
+                                                <span class="text-sm text-gray-500">2023-06-01 至 2023-06-15</span>
+                                            </div>
+                                            <p class="text-sm text-gray-600 mt-1">
+                                                创建飞天形象的初步设计原型，包括2D草图和3D模型雏形，确定风格和技术路线。
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <div class="w-8 h-8 rounded-full bg-yellow-500 flex items-center justify-center text-white flex-shrink-0 mt-1">
+                                            <i class="fa fa-users"></i>
+                                        </div>
+                                        <div class="ml-4 flex-grow">
+                                            <div class="flex items-center justify-between">
+                                                <h5 class="font-medium">招募参与者</h5>
+                                                <span class="text-sm text-gray-500">2023-06-16 至 2023-06-30</span>
+                                            </div>
+                                            <label for="project-type" class="block text-sm font-medium text-gray-700 mb-2">项目类型</label>
+<select id="project-type" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none">
+    <option value="">选择项目类型</option>
+    <option value="digital-art">数字绘画</option>
+    <option value="3d-modeling">3D建模</option>
+    <option value="animation">动画视频</option>
+    <option value="audio">音频作品</option>
+    <option value="text">文本内容</option>
+    <option value="other">其他</option>
+</select>
+</div>
+<div>
+    <label for="project-duration" class="block text-sm font-medium text-gray-700 mb-2">预计项目周期</label>
+    <select id="project-duration" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none">
+        <option value="">选择项目周期</option>
+        <option value="1-month">1个月以内</option>
+        <option value="1-3-months">1-3个月</option>
+        <option value="3-6-months">3-6个月</option>
+        <option value="6-12-months">6-12个月</option>
+        <option value="12-months">12个月以上</option>
+    </select>
+</div>
+</div>
+
+<div class="mb-6">
+    <label for="project-description" class="block text-sm font-medium text-gray-700 mb-2">项目描述</label>
+    <textarea id="project-description" rows="4" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none" placeholder="详细描述你的项目目标、内容和预期成果..."></textarea>
+</div>
+
+<div class="mb-6">
+    <label for="project-cover" class="block text-sm font-medium text-gray-700 mb-2">项目封面</label>
+    <div class="flex items-center justify-center w-full">
+        <label for="dropzone-file" class="flex flex-col items-center justify-center w-full h-40 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+            <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                <i class="fa fa-cloud-upload text-2xl text-gray-400 mb-2"></i>
+                <p class="mb-2 text-sm text-gray-500"><span class="font-semibold">点击上传</span> 或拖放文件</p>
+                <p class="text-xs text-gray-500">支持PNG, JPG, GIF (最大 10MB)</p>
+            </div>
+            <input id="dropzone-file" type="file" class="hidden" accept="image/*" />
+        </label>
+    </div>
+</div>
+
+<div class="mb-6">
+    <h4 class="font-medium text-lg mb-4">收益分配方案</h4>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div>
+            <label for="initiator-share" class="block text-sm font-medium text-gray-700 mb-2">发起人分成比例 (%)</label>
+            <input type="number" id="initiator-share" min="0" max="50" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none" placeholder="输入发起人分成比例">
+        </div>
+        <div>
+            <label for="platform-fee" class="block text-sm font-medium text-gray-700 mb-2">平台服务费率 (%)</label>
+            <input type="number" id="platform-fee" min="0" max="30" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none" placeholder="输入平台服务费率" value="15" readonly>
+        </div>
+    </div>
+    
+    <div class="mb-4">
+        <label class="block text-sm font-medium text-gray-700 mb-2">团队成员分成方式</label>
+        <div class="space-y-3">
+            <div class="flex items-center">
+                <input type="radio" id="equal-share" name="member-share-type" class="h-4 w-4 text-primary focus:ring-primary border-gray-300" checked>
+                <label for="equal-share" class="ml-2 block text-sm text-gray-700">平均分配</label>
+            </div>
+            <div class="flex items-center">
+                <input type="radio" id="role-based" name="member-share-type" class="h-4 w-4 text-primary focus:ring-primary border-gray-300">
+                <label for="role-based" class="ml-2 block text-sm text-gray-700">按角色分配</label>
+            </div>
+            <div class="flex items-center">
+                <input type="radio" id="contribution-based" name="member-share-type" class="h-4 w-4 text-primary focus:ring-primary border-gray-300">
+                <label for="contribution-based" class="ml-2 block text-sm text-gray-700">按贡献度分配</label>
+            </div>
+        </div>
+    </div>
+    
+    <div class="mb-4">
+        <label for="revenue-description" class="block text-sm font-medium text-gray-700 mb-2">收益分配说明</label>
+        <textarea id="revenue-description" rows="3" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none" placeholder="详细说明收益分配的规则和方式..."></textarea>
+    </div>
+</div>
+
+<div class="mb-6">
+    <h4 class="font-medium text-lg mb-4">参与要求</h4>
+    <div class="space-y-4">
+        <div class="flex items-start">
+            <input type="text" class="flex-1 px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none" placeholder="添加参与要求">
+            <button type="button" class="ml-2 w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200 transition-colors">
+                <i class="fa fa-plus"></i>
+            </button>
+        </div>
+        <div class="flex items-start">
+            <input type="text" class="flex-1 px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none" placeholder="添加参与要求">
+            <button type="button" class="ml-2 w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200 transition-colors">
+                <i class="fa fa-plus"></i>
+            </button>
+        </div>
+        <div class="flex items-start">
+            <input type="text" class="flex-1 px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none" placeholder="添加参与要求">
+            <button type="button" class="ml-2 w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200 transition-colors">
+                <i class="fa fa-plus"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="flex items-center justify-between pt-6 border-t border-gray-100">
+    <button type="button" id="cancel-create-project" class="px-6 py-3 border border-gray-200 rounded-lg font-medium hover:bg-gray-50 transition-colors">
+        取消
+    </button>
+    <button type="submit" class="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+        创建项目
+    </button>
+</div>
+</form>
+</div>
+</div>
+</div>
+
+<!-- 页脚 -->
+<footer class="bg-gray-900 text-white py-12">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+                <div class="flex items-center mb-4">
+                    <div class="w-10 h-10 rounded-lg bg-gradient-to-r from-primary to-secondary flex items-center justify-center text-white mr-2">
+                        <i class="fa fa-star-o text-xl"></i>
+                    </div>
+                    <span class="text-xl font-bold">星图共链</span>
+                </div>
+                <p class="text-gray-400 mb-4">
+                    星图共链是一个数字艺术共创平台，连接全球创作者，共同打造、分享和受益于数字艺术作品。
+                </p>
+                <div class="flex space-x-4">
+                    <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:text-white hover:bg-primary transition-colors">
+                        <i class="fa fa-weixin"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:text-white hover:bg-primary transition-colors">
+                        <i class="fa fa-weibo"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:text-white hover:bg-primary transition-colors">
+                        <i class="fa fa-instagram"></i>
+                    </a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-gray-400 hover:text-white hover:bg-primary transition-colors">
+                        <i class="fa fa-twitter"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div>
+                <h4 class="text-lg font-semibold mb-4">快速链接</h4>
+                <ul class="space-y-2">
+                    <li><a href="#" class="text-gray-400 hover:text-white transition-colors">首页</a></li>
+                    <li><a href="#projects" class="text-gray-400 hover:text-white transition-colors">发现项目</a></li>
+                    <li><a href="#create" class="text-gray-400 hover:text-white transition-colors">创建项目</a></li>
+                    <li><a href="#about" class="text-gray-400 hover:text-white transition-colors">关于我们</a></li>
+                    <li><a href="#faq" class="text-gray-400 hover:text-white transition-colors">常见问题</a></li>
+                </ul>
+            </div>
+            
+            <div>
+                <h4 class="text-lg font-semibold mb-4">资源中心</h4>
+                <ul class="space-y-2">
+                    <li><a href="#" class="text-gray-400 hover:text-white transition-colors">使用指南</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white transition-colors">收益模式</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white transition-colors">版权保护</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white transition-colors">成功案例</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white transition-colors">平台公告</a></li>
+                </ul>
+            </div>
+            
+            <div>
+                <h4 class="text-lg font-semibold mb-4">联系我们</h4>
+                <ul class="space-y-2">
+                    <li class="flex items-start">
+                        <i class="fa fa-envelope-o mt-1 mr-2 text-gray-400"></i>
+                        <span class="text-gray-400">contact@xingtu-chain.com</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fa fa-phone mt-1 mr-2 text-gray-400"></i>
+                        <span class="text-gray-400">+86 123 4567 8910</span>
+                    </li>
+                    <li class="flex items-start">
+                        <i class="fa fa-map-marker mt-1 mr-2 text-gray-400"></i>
+                        <span class="text-gray-400">北京市海淀区中关村科技园区</span>
+                    </li>
+                </ul>
+                <div class="mt-4">
+                    <h5 class="font-medium mb-2">订阅我们的通讯</h5>
+                    <div class="flex">
+                        <input type="email" placeholder="输入你的邮箱" class="flex-1 px-4 py-2 rounded-l-lg border-0 focus:ring-2 focus:ring-primary/30 outline-none">
+                        <button class="px-4 py-2 bg-primary text-white rounded-r-lg hover:bg-primary/90 transition-colors">
+                            订阅
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+            <p class="text-gray-400 text-sm mb-4 md:mb-0">
+                &copy; 2023 星图共链数字艺术共创平台. 保留所有权利.
+            </p>
+            <div class="flex space-x-6">
+                <a href="#" class="text-gray-400 hover:text-white text-sm transition-colors">隐私政策</a>
+                <a href="#" class="text-gray-400 hover:text-white text-sm transition-colors">服务条款</a>
+                <a href="#" class="text-gray-400 hover:text-white text-sm transition-colors">法律声明</a>
+                <a href="#" class="text-gray-400 hover:text-white text-sm transition-colors">网站地图</a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- JavaScript -->
+<script>
+    // 导航栏滚动效果
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 50) {
+            navbar.classList.add('py-2', 'shadow-md');
+            navbar.classList.remove('py-3');
+        } else {
+            navbar.classList.add('py-3');
+            navbar.classList.remove('py-2', 'shadow-md');
+        }
+    });
+
+    // 移动端菜单切换
+    const mobileMenuButton = document.getElementById('mobile-menu-button');
+    const mobileMenu = document.getElementById('mobile-menu');
+    mobileMenuButton.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+    });
+
+    // 用户菜单切换
+    const userMenuButton = document.querySelector('.relative button');
+    const userMenu = document.getElementById('user-menu');
+    userMenuButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        userMenu.classList.toggle('hidden');
+    });
+
+    // 点击页面其他地方关闭用户菜单
+    document.addEventListener('click', () => {
+        userMenu.classList.add('hidden');
+    });
+
+    // 项目详情模态框
+    const projectCards = document.querySelectorAll('.card-hover');
+    const projectDetailsModal = document.getElementById('project-details-modal');
+    const closeProjectDetailsModal = document.getElementById('close-project-details-modal');
+
+    projectCards.forEach(card => {
+        card.addEventListener('click', () => {
+            projectDetailsModal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        });
+    });
+
+    closeProjectDetailsModal.addEventListener('click', () => {
+        projectDetailsModal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    });
+
+    // 创建项目模态框
+    const createProjectButton = document.getElementById('create-project');
+    const mobileCreateProjectButton = document.getElementById('mobile-create-project');
+    const createProjectModal = document.getElementById('create-project-modal');
+    const closeCreateProjectModal = document.getElementById('close-create-project-modal');
+    const cancelCreateProject = document.getElementById('cancel-create-project');
+
+    createProjectButton.addEventListener('click', () => {
+        createProjectModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    });
+
+    mobileCreateProjectButton.addEventListener('click', () => {
+        createProjectModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        mobileMenu.classList.add('hidden');
+    });
+
+    closeCreateProjectModal.addEventListener('click', () => {
+        createProjectModal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    });
+
+    cancelCreateProject.addEventListener('click', () => {
+        createProjectModal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    });
+
+    // 点击模态框外部关闭
+    projectDetailsModal.addEventListener('click', (e) => {
+        if (e.target === projectDetailsModal) {
+            projectDetailsModal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+    });
+
+    createProjectModal.addEventListener('click', (e) => {
+        if (e.target === createProjectModal) {
+            createProjectModal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+    });
+
+    // 收益分配图表
+    window.addEventListener('load', () => {
+        // 收益趋势图表
+        const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+        const revenueChart = new Chart(revenueCtx, {
+            type: 'line',
+            data: {
+                labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                datasets: [
+                    {
+                        label: '总收益',
+                        data: [3500, 4200, 5100, 3800, 4500, 6500],
+                        borderColor: '#6A11CB',
+                        backgroundColor: 'rgba(106, 17, 203, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: '你的收益',
+                        data: [2800, 3400, 4200, 3100, 3700, 5300],
+                        borderColor: '#2575FC',
+                        backgroundColor: 'rgba(37, 117, 252, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+
+        // 收益来源分布图表
+        const sourceCtx = document.getElementById('revenueSourceChart').getContext('2d');
+        const sourceChart = new Chart(sourceCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['作品销售', '版权授权', '赞助收入'],
+                datasets: [{
+                    data: [65, 25, 10],
+                    backgroundColor: [
+                        '#6A11CB',
+                        '#2575FC',
+                        '#34D399'
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                cutout: '70%'
+            }
+        });
+    });
+
+    // 平滑滚动
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            
+            const targetId = this.getAttribute('href');
+            const targetElement = document.querySelector(targetId);
+            
+            if (targetElement) {
+                window.scrollTo({
+                    top: targetElement.offsetTop - 80,
+                    behavior: 'smooth'
+                });
+                
+                // 如果是移动端，点击后关闭菜单
+                if (window.innerWidth < 768) {
+                    mobileMenu.classList.add('hidden');
+                }
+            }
+        });
+    });
+
+    // 表单提交
+    const createProjectForm = document.getElementById('create-project-form');
+    createProjectForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        // 这里添加表单提交逻辑
+        alert('项目创建成功！');
+        createProjectModal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+        createProjectForm.reset();
+    });
+</script>
+</body>
+</html>
+    
