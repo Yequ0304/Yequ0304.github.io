@@ -1,0 +1,1472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星图共链 - 用户管理</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind 配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6a11cb',
+                        secondary: '#2575fc',
+                        accent: '#34d399',
+                        dark: '#1e293b',
+                        light: '#f8fafc'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <!-- 自定义工具类 -->
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .gradient-bg {
+                background: linear-gradient(135deg, var(--tw-gradient-stops));
+            }
+            .card-hover {
+                transition: all 0.3s ease;
+            }
+            .card-hover:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            .glass-effect {
+                backdrop-filter: blur(10px);
+                background-color: rgba(255, 255, 255, 0.7);
+            }
+            .animate-float {
+                animation: float 6s ease-in-out infinite;
+            }
+            @keyframes float {
+                0% { transform: translateY(0px); }
+                50% { transform: translateY(-10px); }
+                100% { transform: translateY(0px); }
+            }
+        }
+    </style>
+    
+    <style>
+        /* 全局样式 */
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+        
+        /* 动画效果 */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
+        
+        /* 用户状态标签样式 */
+        .status-active {
+            @apply bg-green-100 text-green-800;
+        }
+        .status-inactive {
+            @apply bg-yellow-100 text-yellow-800;
+        }
+        .status-blocked {
+            @apply bg-red-100 text-red-800;
+        }
+        
+        /* 角色标签样式 */
+        .role-admin {
+            @apply bg-primary/10 text-primary;
+        }
+        .role-artist {
+            @apply bg-secondary/10 text-secondary;
+        }
+        .role-collector {
+            @apply bg-accent/10 text-accent;
+        }
+        .role-curator {
+            @apply bg-purple-100 text-purple-800;
+        }
+        
+        /* 表格行悬停效果 */
+        .table-row-hover {
+            transition: all 0.2s ease;
+        }
+        
+        .table-row-hover:hover {
+            background-color: rgba(106, 17, 203, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 font-inter">
+    <!-- 顶部导航栏 -->
+    <header id="navbar" class="fixed w-full top-0 z-50 transition-all duration-300">
+        <div class="glass-effect border-b border-gray-200">
+            <div class="container mx-auto px-4 py-3">
+                <div class="flex items-center justify-between">
+                    <!-- Logo -->
+                    <div class="flex items-center space-x-2">
+                        <div class="w-10 h-10 rounded-lg gradient-bg from-primary to-secondary flex items-center justify-center">
+                            <i class="fa fa-link text-white text-xl"></i>
+                        </div>
+                        <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">星图共链</span>
+                    </div>
+                    
+                    <!-- 桌面导航菜单 -->
+                    <nav class="hidden md:flex items-center space-x-8">
+                        <a href="index.html" class="font-medium hover:text-primary transition-colors duration-200">首页</a>
+                        <a href="index.html#features" class="font-medium hover:text-primary transition-colors duration-200">功能模块</a>
+                        <a href="index.html#showcase" class="font-medium hover:text-primary transition-colors duration-200">数字藏品</a>
+                        <a href="index.html#about" class="font-medium hover:text-primary transition-colors duration-200">关于我们</a>
+                    </nav>
+                    
+                    <!-- 用户操作区 -->
+                    <div class="flex items-center space-x-4">
+                        <button class="hidden md:flex items-center px-4 py-2 rounded-full border border-primary text-primary hover:bg-primary/5 transition-colors duration-200">
+                            <i class="fa fa-search mr-2"></i>
+                            <span>搜索</span>
+                        </button>
+                        <div class="relative">
+                            <button class="flex items-center space-x-2 px-4 py-2 rounded-full bg-primary text-white hover:bg-primary/90 transition-colors duration-200">
+                                <div class="w-8 h-8 rounded-full overflow-hidden">
+                                    <img src="https://picsum.photos/id/1005/100/100" alt="用户头像" class="w-full h-full object-cover">
+                                </div>
+                                <span class="hidden md:inline">张晓明</span>
+                                <i class="fa fa-angle-down"></i>
+                            </button>
+                            
+                            <!-- 用户下拉菜单 -->
+                            <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 z-10 hidden" id="user-menu">
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fa fa-user-circle mr-2"></i>个人资料
+                                </a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fa fa-cog mr-2"></i>账户设置
+                                </a>
+                                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                    <i class="fa fa-question-circle mr-2"></i>帮助中心
+                                </a>
+                                <div class="border-t border-gray-100 my-1"></div>
+                                <a href="#" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+                                    <i class="fa fa-sign-out mr-2"></i>退出登录
+                                </a>
+                            </div>
+                        </div>
+                        <!-- 移动端菜单按钮 -->
+                        <button id="mobile-menu-button" class="md:hidden text-gray-600 hover:text-primary">
+                            <i class="fa fa-bars text-2xl"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 移动端菜单 -->
+        <div id="mobile-menu" class="md:hidden hidden bg-white border-b border-gray-200">
+            <div class="container mx-auto px-4 py-3">
+                <nav class="flex flex-col space-y-3">
+                    <a href="index.html" class="font-medium hover:text-primary transition-colors duration-200 py-2">首页</a>
+                    <a href="index.html#features" class="font-medium hover:text-primary transition-colors duration-200 py-2">功能模块</a>
+                    <a href="index.html#showcase" class="font-medium hover:text-primary transition-colors duration-200 py-2">数字藏品</a>
+                    <a href="index.html#about" class="font-medium hover:text-primary transition-colors duration-200 py-2">关于我们</a>
+                    <div class="border-t border-gray-100 my-1"></div>
+                    <a href="#" class="font-medium hover:text-primary transition-colors duration-200 py-2">
+                        <i class="fa fa-user-circle mr-2"></i>个人资料
+                    </a>
+                    <a href="#" class="font-medium hover:text-primary transition-colors duration-200 py-2">
+                        <i class="fa fa-cog mr-2"></i>账户设置
+                    </a>
+                    <a href="#" class="font-medium hover:text-primary transition-colors duration-200 py-2">
+                        <i class="fa fa-question-circle mr-2"></i>帮助中心
+                    </a>
+                    <a href="#" class="font-medium text-red-600 hover:text-red-700 transition-colors duration-200 py-2">
+                        <i class="fa fa-sign-out mr-2"></i>退出登录
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主内容区 -->
+    <main class="container mx-auto px-4 pt-24 pb-16">
+        <!-- 页面标题 -->
+        <div class="mb-8 text-center">
+            <h1 class="text-[clamp(1.8rem,5vw,3rem)] font-bold text-dark mb-2">用户管理</h1>
+            <p class="text-gray-600 max-w-2xl mx-auto">全面管理平台用户，包括用户信息、权限和角色，确保平台安全有序运行</p>
+        </div>
+
+        <!-- 用户统计卡片 -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white rounded-xl shadow-sm p-6 card-hover">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">总用户数</p>
+                        <h3 class="text-3xl font-bold mt-1">1,286</h3>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                        <i class="fa fa-users text-xl"></i>
+                    </div>
+                </div>
+                <div class="mt-4 w-full bg-gray-200 rounded-full h-1.5">
+                    <div class="bg-primary h-1.5 rounded-full" style="width: 75%"></div>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">较上月增长 <span class="text-green-600 font-medium">+12%</span></p>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm p-6 card-hover">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">本月新增</p>
+                        <h3 class="text-3xl font-bold mt-1">248</h3>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center text-secondary">
+                        <i class="fa fa-user-plus text-xl"></i>
+                    </div>
+                </div>
+                <div class="mt-4 w-full bg-gray-200 rounded-full h-1.5">
+                    <div class="bg-secondary h-1.5 rounded-full" style="width: 60%"></div>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">完成率 <span class="text-green-600 font-medium">60%</span></p>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm p-6 card-hover">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">活跃用户</p>
+                        <h3 class="text-3xl font-bold mt-1">956</h3>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center text-accent">
+                        <i class="fa fa-user-circle text-xl"></i>
+                    </div>
+                </div>
+                <div class="mt-4 w-full bg-gray-200 rounded-full h-1.5">
+                    <div class="bg-accent h-1.5 rounded-full" style="width: 74%"></div>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">较上月 <span class="text-green-600 font-medium">+8%</span></p>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm p-6 card-hover">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <p class="text-gray-500 text-sm">待审核用户</p>
+                        <h3 class="text-3xl font-bold mt-1">12</h3>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-800">
+                        <i class="fa fa-clock-o text-xl"></i>
+                    </div>
+                </div>
+                <div class="mt-4 w-full bg-gray-200 rounded-full h-1.5">
+                    <div class="bg-yellow-500 h-1.5 rounded-full" style="width: 10%"></div>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">较上月 <span class="text-red-600 font-medium">-50%</span></p>
+            </div>
+        </div>
+
+        <!-- 用户数据可视化 -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-xl shadow-sm p-6 lg:col-span-2">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-bold">用户增长趋势</h3>
+                    <div class="flex space-x-2">
+                        <button class="px-3 py-1 text-sm bg-primary text-white rounded-lg">周</button>
+                        <button class="px-3 py-1 text-sm bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200">月</button>
+                        <button class="px-3 py-1 text-sm bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200">年</button>
+                    </div>
+                </div>
+                <div class="h-80">
+                    <canvas id="userGrowthChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-sm p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-lg font-bold">用户角色分布</h3>
+                    <button class="text-gray-400 hover:text-gray-600">
+                        <i class="fa fa-ellipsis-v"></i>
+                    </button>
+                </div>
+                <div class="h-80">
+                    <canvas id="userRoleChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- 用户列表 -->
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-8">
+            <div class="p-6 border-b border-gray-100">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <h2 class="text-lg font-bold">用户列表</h2>
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <input type="text" placeholder="搜索用户..." class="pl-10 pr-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all">
+                            <i class="fa fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                        </div>
+                        <select class="px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all">
+                            <option>所有角色</option>
+                            <option>管理员</option>
+                            <option>创作者</option>
+                            <option>收藏家</option>
+                            <option>策展人</option>
+                        </select>
+                        <select class="px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all">
+                            <option>所有状态</option>
+                            <option>活跃</option>
+                            <option>未激活</option>
+                            <option>已封禁</option>
+                        </select>
+                        <button class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                            <i class="fa fa-filter mr-2"></i>筛选
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="bg-gray-50">
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">用户</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">邮箱</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">角色</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">注册日期</th>
+                            <th class="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <tr class="table-row-hover">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 rounded-full overflow-hidden mr-3">
+                                        <img src="https://picsum.photos/id/1005/100/100" alt="用户头像" class="w-full h-full object-cover">
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-medium text-gray-900">张晓明</div>
+                                        <div class="text-xs text-gray-500">ID: U00128</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">zhangxiaoming@example.com</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full role-admin">
+                                    管理员
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full status-active">
+                                    活跃
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-01-15</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <div class="flex space-x-2">
+                                    <button class="text-primary hover:text-primary/80">
+                                        <i class="fa fa-eye"></i>
+                                    </button>
+                                    <button class="text-gray-500 hover:text-gray-700">
+                                        <i class="fa fa-edit"></i>
+                                    </button>
+                                    <button class="text-gray-500 hover:text-gray-700">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="table-row-hover">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 rounded-full overflow-hidden mr-3">
+                                        <img src="https://picsum.photos/id/1012/100/100" alt="用户头像" class="w-full h-full object-cover">
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-medium text-gray-900">李艺术</div>
+                                        <div class="text-xs text-gray-500">ID: U00127</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">liyi@example.com</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full role-artist">
+                                    创作者
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full status-active">
+                                    活跃
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-02-28</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <div class="flex space-x-2">
+                                    <button class="text-primary hover:text-primary/80">
+                                        <i class="fa fa-eye"></i>
+                                    </button>
+                                    <button class="text-gray-500 hover:text-gray-700">
+                                        <i class="fa fa-edit"></i>
+                                    </button>
+                                    <button class="text-gray-500 hover:text-gray-700">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="table-row-hover">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 rounded-full overflow-hidden mr-3">
+                                        <img src="https://picsum.photos/id/1025/100/100" alt="用户头像" class="w-full h-full object-cover">
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-medium text-gray-900">王科技</div>
+                                        <div class="text-xs text-gray-500">ID: U00126</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">wangkeji@example.com</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full role-artist">
+                                    创作者
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full status-active">
+                                    活跃
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-03-12</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <div class="flex space-x-2">
+                                    <button class="text-primary hover:text-primary/80">
+                                        <i class="fa fa-eye"></i>
+                                    </button>
+                                    <button class="text-gray-500 hover:text-gray-700">
+                                        <i class="fa fa-edit"></i>
+                                    </button>
+                                    <button class="text-gray-500 hover:text-gray-700">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="table-row-hover">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 rounded-full overflow-hidden mr-3">
+                                        <img src="https://picsum.photos/id/1062/100/100" alt="用户头像" class="w-full h-full object-cover">
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-medium text-gray-900">陈教授</div>
+                                        <div class="text-xs text-gray-500">ID: U00125</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">chenjiaoshou@example.com</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full role-curator">
+                                    策展人
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full status-active">
+                                    活跃
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-04-05</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <div class="flex space-x-2">
+                                    <button class="text-primary hover:text-primary/80">
+                                        <i class="fa fa-eye"></i>
+                                    </button>
+                                    <button class="text-gray-500 hover:text-gray-700">
+                                        <i class="fa fa-edit"></i>
+                                    </button>
+                                    <button class="text-gray-500 hover:text-gray-700">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="table-row-hover">
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 rounded-full overflow-hidden mr-3">
+                                        <img src="https://picsum.photos/id/1074/100/100" alt="用户头像" class="w-full h-full object-cover">
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-medium text-gray-900">林声音</div>
+                                        <div class="text-xs text-gray-500">ID: U00124</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">linshengyin@example.com</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full role-artist">
+                                    创作者
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full status-active">
+                                    活跃
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2025-04-20</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <div class="flex space-x-2">
+                                    <button class="text-primary hover:text-primary/80">
+                                        <i class="fa fa-eye"></i>
+                                    </button>
+                                    <button class="text-gray-500 hover:text-gray-700">
+                                        <i class="fa fa-edit"></i>
+                                    </button>
+                                    <button class="text-gray-500 hover:text-gray-700">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="p-6 border-t border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <p class="text-sm text-gray-500">
+                    显示 <span class="font-medium">1</span> 到 <span class="font-medium">5</span> 条，共 <span class="font-medium">1,286</span> 条记录
+                </p>
+                <div class="flex space-x-2">
+                    <button class="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 disabled:opacity-50" disabled>
+                        <i class="fa fa-chevron-left"></i>
+                    </button>
+                    <button class="w-10 h-10 rounded-lg bg-primary text-white flex items-center justify-center">1</button>
+                    <button class="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center text-gray-700 hover:bg-gray-50">2</button>
+                    <button class="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center text-gray-700 hover:bg-gray-50">3</button>
+                    <button class="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center text-gray-700 hover:bg-gray-50">4</button>
+                    <button class="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center text-gray-700 hover:bg-gray-50">5</button>
+                    <button class="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50">
+                        <i class="fa fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 角色管理 -->
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-8">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                <h2 class="text-lg font-bold">角色管理</h2>
+                <button class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                    <i class="fa fa-plus-circle mr-2"></i>添加角色
+                </button>
+            </div>
+            
+            <div class="p-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- 管理员角色 -->
+                    <div class="border border-gray-200 rounded-xl p-5 hover:border-primary transition-colors">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="font-semibold text-lg">管理员</h3>
+                                <p class="text-sm text-gray-500">拥有所有系统权限</p>
+                            </div>
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-primary/10 text-primary">
+                                4人
+                            </span>
+                        </div>
+                        <div class="space-y-2 mb-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">用户管理</span>
+                                <i class="fa fa-check text-green-500"></i>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">内容审核</span>
+                                <i class="fa fa-check text-green-500"></i>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">系统设置</span>
+                                <i class="fa fa-check text-green-500"></i>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">数据分析</span>
+                                <i class="fa fa-check text-green-500"></i>
+                            </div>
+                        </div>
+                        <div class="flex justify-between">
+                            <button class="text-primary hover:text-primary/80 text-sm">编辑</button>
+                            <button class="text-gray-500 hover:text-gray-700 text-sm">查看权限</button>
+                        </div>
+                    </div>
+                    
+                    <!-- 创作者角色 -->
+                    <div class="border border-gray-200 rounded-xl p-5 hover:border-primary transition-colors">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="font-semibold text-lg">创作者</h3>
+                                <p class="text-sm text-gray-500">可以上传和管理内容</p>
+                            </div>
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-secondary/10 text-secondary">
+                                342人
+                            </span>
+                        </div>
+                        <div class="space-y-2 mb-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">内容上传</span>
+                                <i class="fa fa-check text-green-500"></i>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">版权存证</span>
+                                <i class="fa fa-check text-green-500"></i>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">内容管理</span>
+                                <i class="fa fa-check text-green-500"></i>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">收益查看</span>
+                                <i class="fa fa-check text-green-500"></i>
+                            </div>
+                        </div>
+                        <div class="flex justify-between">
+                            <button class="text-primary hover:text-primary/80 text-sm">编辑</button>
+                            <button class="text-gray-500 hover:text-gray-700 text-sm">查看权限</button>
+                        </div>
+                    </div>
+                    
+                    <!-- 收藏家角色 -->
+                    <div class="border border-gray-200 rounded-xl p-5 hover:border-primary transition-colors">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="font-semibold text-lg">收藏家</h3>
+                                <p class="text-sm text-gray-500">可以收藏和交易数字资产</p>
+                            </div>
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-accent/10 text-accent">
+                                856人
+                            </span>
+                        </div>
+                        <div class="space-y-2 mb-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">浏览资产</span>
+                                <i class="fa fa-check text-green-500"></i>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">购买资产</span>
+                                <i class="fa fa-check text-green-500"></i>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">收藏管理</span>
+                                <i class="fa fa-check text-green-500"></i>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">个人资料</span>
+                                <i class="fa fa-check text-green-500"></i>
+                            </div>
+                        </div>
+                        <div class="flex justify-between">
+                            <button class="text-primary hover:text-primary/80 text-sm">编辑</button>
+                            <button class="text-gray-500 hover:text-gray-700 text-sm">查看权限</button>
+                        </div>
+                    </div>
+                    
+                    <!-- 策展人角色 -->
+                    <div class="border border-gray-200 rounded-xl p-5 hover:border-primary transition-colors">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="font-semibold text-lg">策展人</h3>
+                                <p class="text-sm text-gray-500">可以创建和管理展览</p>
+                            </div>
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">
+                                84人
+                            </span>
+                        </div>
+                        <div class="space-y-2 mb-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">创建展览</span>
+                                <i class="fa fa-check text-green-500"></i>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">展览管理</span>
+                                <i class="fa fa-check text-green-500"></i>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">邀请创作者</span>
+                                <i class="fa fa-check text-green-500"></i>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">展览数据分析</span>
+                                <i class="fa fa-check text-green-500"></i>
+                            </div>
+                        </div>
+                        <div class="flex justify-between">
+                            <button class="text-primary hover:text-primary/80 text-sm">编辑</button>
+                            <button class="text-gray-500 hover:text-gray-700 text-sm">查看权限</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 用户操作日志 -->
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                <h2 class="text-lg font-bold">用户操作日志</h2>
+                <button class="text-primary hover:text-primary/80 text-sm">
+                    查看全部 <i class="fa fa-angle-right ml-1"></i>
+                </button>
+            </div>
+            
+            <div class="p-6">
+                <div class="space-y-6">
+                    <div class="flex items-start">
+                        <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary mr-4 flex-shrink-0">
+                            <i class="fa fa-user-plus"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center">
+                                <span class="font-medium">系统</span>
+                                <span class="text-gray-500 text-sm mx-2">·</span>
+                                <span class="text-gray-500 text-sm">2025-06-10 14:30</span>
+                            </div>
+                            <p class="text-gray-600 mt-1">用户 <span class="font-medium">林声音</span> 注册成功</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-green-600 mr-4 flex-shrink-0">
+                            <i class="fa fa-check-circle"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center">
+                                <span class="font-medium">张晓明</span>
+                                <span class="text-gray-500 text-sm mx-2">·</span>
+                                <span class="text-gray-500 text-sm">2025-06-09 10:15</span>
+                            </div>
+                            <p class="text-gray-600 mt-1">审核通过用户 <span class="font-medium">王科技</span> 的创作者申请</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600 mr-4 flex-shrink-0">
+                            <i class="fa fa-ban"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center">
+                                <span class="font-medium">张晓明</span>
+                                <span class="text-gray-500 text-sm mx-2">·</span>
+                                <span class="text-gray-500 text-sm">2025-06-08 16:45</span>
+                            </div>
+                            <p class="text-gray-600 mt-1">封禁用户 <span class="font-medium">刘不良</span>，原因：违反社区规则</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600 mr-4 flex-shrink-0">
+                            <i class="fa fa-exclamation-circle"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center">
+                                <span class="font-medium">系统</span>
+                                <span class="text-gray-500 text-sm mx-2">·</span>
+                                <span class="text-gray-500 text-sm">2025-06-07 09:22</span>
+                            </div>
+                            <p class="text-gray-600 mt-1">用户 <span class="font-medium">陈教授</span> 尝试多次登录失败</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start">
+                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-4 flex-shrink-0">
+                            <i class="fa fa-cog"></i>
+                        </div>
+                        <div>
+                            <div class="flex items-center">
+                                <span class="font-medium">张晓明</span>
+                                <span class="text-gray-500 text-sm mx-2">·</span>
+                                <span class="text-gray-500 text-sm">2025-06-05 15:30</span>
+                            </div>
+                            <p class="text-gray-600 mt-1">修改用户 <span class="font-medium">李艺术</span> 的角色为 <span class="font-medium">创作者</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white pt-16 pb-8">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+                <div>
+                    <div class="flex items-center space-x-2 mb-6">
+                        <div class="w-10 h-10 rounded-lg gradient-bg from-primary to-secondary flex items-center justify-center">
+                            <i class="fa fa-link text-white text-xl"></i>
+                        </div>
+                        <span class="text-xl font-bold">星图共链</span>
+                    </div>
+                    <p class="text-gray-400 mb-6">利用区块链技术，为文化遗产创造数字资产新生态，让每一件文化瑰宝都能在数字世界中永存。</p>
+                    <div class="flex space-x-4">
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary transition-colors duration-200">
+                            <i class="fa fa-weibo"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary transition-colors duration-200">
+                            <i class="fa fa-wechat"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary transition-colors duration-200">
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-primary transition-colors duration-200">
+                            <i class="fa fa-instagram"></i>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-6">快速链接</h4>
+                    <ul class="space-y-4">
+                        <li><a href="index.html" class="text-gray-400 hover:text-white transition-colors duration-200">首页</a></li>
+                        <li><a href="index.html#features" class="text-gray-400 hover:text-white transition-colors duration-200">功能模块</a></li>
+                        <li><a href="index.html#showcase" class="text-gray-400 hover:text-white transition-colors duration-200">数字藏品</a></li>
+                        <li><a href="index.html#about" class="text-gray-400 hover:text-white transition-colors duration-200">关于我们</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">联系我们</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-6">功能模块</h4>
+                    <ul class="space-y-4">
+                        <li><a href="user_management.html" class="text-gray-400 hover:text-white transition-colors duration-200">用户管理</a></li>
+                        <li><a href="copyright_records.html" class="text-gray-400 hover:text-white transition-colors duration-200">版权存证</a></li>
+                        <li><a href="marketplace.html" class="text-gray-400 hover:text-white transition-colors duration-200">数字资产交易</a></li>
+                        <li><a href="collaboration_workshop.html" class="text-gray-400 hover:text-white transition-colors duration-200">用户共创</a></li>
+                        <li><a href="royalty_dashboard.html" class="text-gray-400 hover:text-white transition-colors duration-200">收益分配</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-6">帮助中心</h4>
+                    <ul class="space-y-4">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">常见问题</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">使用教程</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">隐私政策</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">服务条款</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition-colors duration-200">联系客服</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 pt-8">
+                <div class="flex flex-col md:flex-row justify-between items-center">
+                    <p class="text-gray-500 text-sm mb-4 md:mb-0">© 2023 星图共链. 保留所有权利.</p>
+                    <div class="flex space-x-6">
+                        <a href="#" class="text-gray-500 hover:text-white text-sm transition-colors duration-200">隐私政策</a>
+                        <a href="#" class="text-gray-500 hover:text-white text-sm transition-colors duration-200">服务条款</a>
+                        <a href="#" class="text-gray-500 hover:text-white text-sm transition-colors duration-200">Cookie 政策</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 添加新用户模态框 -->
+    <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden" id="add-user-modal">
+        <div class="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="text-xl font-bold">添加新用户</h3>
+                <button id="close-add-user-modal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <form id="add-user-form" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="new-user-name" class="block text-sm font-medium text-gray-700 mb-2">用户名</label>
+                            <input type="text" id="new-user-name" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all" placeholder="输入用户名">
+                        </div>
+                        <div>
+                            <label for="new-user-email" class="block text-sm font-medium text-gray-700 mb-2">邮箱</label>
+                            <input type="email" id="new-user-email" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all" placeholder="输入邮箱地址">
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="new-user-password" class="block text-sm font-medium text-gray-700 mb-2">密码</label>
+                            <input type="password" id="new-user-password" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all" placeholder="输入密码">
+                        </div>
+                        <div>
+                            <label for="new-user-role" class="block text-sm font-medium text-gray-700 mb-2">用户角色</label>
+                            <select id="new-user-role" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all">
+                                <option>选择角色</option>
+                                <option>管理员</option>
+                                <option>创作者</option>
+                                <option>收藏家</option>
+                                <option>策展人</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="new-user-status" class="block text-sm font-medium text-gray-700 mb-2">用户状态</label>
+                        <div class="flex space-x-4">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="new-user-status" value="active" class="form-radio h-5 w-5 text-primary focus:ring-primary">
+                                <span class="ml-2 text-gray-700">活跃</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="new-user-status" value="inactive" class="form-radio h-5 w-5 text-primary focus:ring-primary">
+                                <span class="ml-2 text-gray-700">未激活</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="new-user-status" value="blocked" class="form-radio h-5 w-5 text-primary focus:ring-primary">
+                                <span class="ml-2 text-gray-700">已封禁</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="new-user-notes" class="block text-sm font-medium text-gray-700 mb-2">备注</label>
+                        <textarea id="new-user-notes" rows="3" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all" placeholder="输入备注信息..."></textarea>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-4">
+                        <button type="button" id="cancel-add-user" class="px-6 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">取消</button>
+                        <button type="submit" class="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">添加用户</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑用户模态框 -->
+    <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden" id="edit-user-modal">
+        <div class="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="text-xl font-bold">编辑用户</h3>
+                <button id="close-edit-user-modal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <form id="edit-user-form" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="edit-user-name" class="block text-sm font-medium text-gray-700 mb-2">用户名</label>
+                            <input type="text" id="edit-user-name" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all" value="李艺术">
+                        </div>
+                        <div>
+                            <label for="edit-user-email" class="block text-sm font-medium text-gray-700 mb-2">邮箱</label>
+                            <input type="email" id="edit-user-email" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all" value="liyi@example.com">
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="edit-user-password" class="block text-sm font-medium text-gray-700 mb-2">密码</label>
+                            <input type="password" id="edit-user-password" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all" placeholder="不修改请留空">
+                        </div>
+                        <div>
+                            <label for="edit-user-role" class="block text-sm font-medium text-gray-700 mb-2">用户角色</label>
+                            <select id="edit-user-role" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all">
+                                <option>管理员</option>
+                                <option selected>创作者</option>
+                                <option>收藏家</option>
+                                <option>策展人</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="edit-user-status" class="block text-sm font-medium text-gray-700 mb-2">用户状态</label>
+                        <div class="flex space-x-4">
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="edit-user-status" value="active" class="form-radio h-5 w-5 text-primary focus:ring-primary" checked>
+                                <span class="ml-2 text-gray-700">活跃</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="edit-user-status" value="inactive" class="form-radio h-5 w-5 text-primary focus:ring-primary">
+                                <span class="ml-2 text-gray-700">未激活</span>
+                            </label>
+                            <label class="inline-flex items-center">
+                                <input type="radio" name="edit-user-status" value="blocked" class="form-radio h-5 w-5 text-primary focus:ring-primary">
+                                <span class="ml-2 text-gray-700">已封禁</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="edit-user-notes" class="block text-sm font-medium text-gray-700 mb-2">备注</label>
+                        <textarea id="edit-user-notes" rows="3" class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition-all" placeholder="输入备注信息...">平台活跃创作者，已上传36件作品，获得128个收藏</textarea>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-4">
+                        <button type="button" id="cancel-edit-user" class="px-6 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">取消</button>
+                        <button type="submit" class="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">保存更改</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 查看用户详情模态框 -->
+    <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden" id="user-details-modal">
+        <div class="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="text-xl font-bold">用户详情</h3>
+                <button id="close-user-details-modal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fa fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <div class="flex flex-col md:flex-row gap-6">
+                    <div class="w-full md:w-1/3">
+                        <div class="bg-gray-50 rounded-xl p-6 text-center">
+                            <div class="w-24 h-24 rounded-full overflow-hidden mx-auto mb-4">
+                                <img src="https://picsum.photos/id/1012/200/200" alt="用户头像" class="w-full h-full object-cover">
+                            </div>
+                            <h3 class="text-xl font-bold">李艺术</h3>
+                            <p class="text-gray-500">ID: U00127</p>
+                            <div class="mt-4">
+                                <span class="px-3 py-1 text-sm font-semibold rounded-full role-artist">
+                                    创作者
+                                </span>
+                            </div>
+                            <div class="mt-6">
+                                <div class="flex justify-between items-center mb-3">
+                                    <span class="text-gray-600">状态</span>
+                                    <span class="px-2 py-1 text-xs font-semibold rounded-full status-active">
+                                        活跃
+                                    </span>
+                                </div>
+                                <div class="flex justify-between items-center mb-3">
+                                    <span class="text-gray-600">注册日期</span>
+                                    <span class="text-gray-700">2025-02-28</span>
+                                </div>
+                                <div class="flex justify-between items-center mb-3">
+                                    <span class="text-gray-600">最后登录</span>
+                                    <span class="text-gray-700">今天 09:15</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-gray-600">作品数量</span>
+                                    <span class="text-gray-700">36 件</span>
+                                </div>
+                            </div>
+                            <div class="mt-6 pt-6 border-t border-gray-200">
+                                <div class="flex justify-between mb-3">
+                                    <span class="text-gray-600">数字资产</span>
+                                    <span class="text-gray-700 font-medium">¥12,480</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">累计收益</span>
+                                    <span class="text-gray-700 font-medium">¥3,650</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="w-full md:w-2/3">
+                        <div class="bg-gray-50 rounded-xl p-6 mb-6">
+                            <h4 class="text-lg font-semibold mb-4">基本信息</h4>
+                            <div class="space-y-4">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">邮箱</span>
+                                    <span class="text-gray-800">liyi@example.com</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">手机号</span>
+                                    <span class="text-gray-800">138****5678</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">地区</span>
+                                    <span class="text-gray-800">北京</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">专业领域</span>
+                                    <span class="text-gray-800">数字绘画、3D模型</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-600">实名认证</span>
+                                    <span class="text-green-600">已认证</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-50 rounded-xl p-6 mb-6">
+                            <h4 class="text-lg font-semibold mb-4">个人简介</h4>
+                            <p class="text-gray-700">
+                                数字艺术家，专注于中国传统文化元素与现代数字艺术的结合，擅长3D建模和数字绘画。曾参与多个文化遗产数字化项目，作品融合传统与现代审美，具有独特的艺术风格。
+                            </p>
+                        </div>
+                        
+                        <div class="bg-gray-50 rounded-xl p-6">
+                            <h4 class="text-lg font-semibold mb-4">最近活动</h4>
+                            <div class="space-y-4">
+                                <div class="bg-gray-50 rounded-xl p-6">
+                                    <h4 class="text-lg font-semibold mb-4">最近活动</h4>
+                                    <div class="space-y-4">
+                                        <div class="flex items-start">
+                                            <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 mr-3 flex-shrink-0">
+                                                <i class="fa fa-upload text-sm"></i>
+                                            </div>
+                                            <div>
+                                                <div class="flex items-center">
+                                                    <span class="font-medium">上传作品</span>
+                                                    <span class="text-gray-500 text-sm mx-2">·</span>
+                                                    <span class="text-gray-500 text-sm">今天 09:15</span>
+                                                </div>
+                                                <p class="text-gray-600 mt-1">《山水之间》已上传并提交审核</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex items-start">
+                                            <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-3 flex-shrink-0">
+                                                <i class="fa fa-comment text-sm"></i>
+                                            </div>
+                                            <div>
+                                                <div class="flex items-center">
+                                                    <span class="font-medium">评论互动</span>
+                                                    <span class="text-gray-500 text-sm mx-2">·</span>
+                                                    <span class="text-gray-500 text-sm">昨天 16:42</span>
+                                                </div>
+                                                <p class="text-gray-600 mt-1">回复了收藏家"收藏家001"对作品《古韵今声》的评论</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex items-start">
+                                            <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 mr-3 flex-shrink-0">
+                                                <i class="fa fa-paint-brush text-sm"></i>
+                                            </div>
+                                            <div>
+                                                <div class="flex items-center">
+                                                    <span class="font-medium">创作活动</span>
+                                                    <span class="text-gray-500 text-sm mx-2">·</span>
+                                                    <span class="text-gray-500 text-sm">2025-06-08 10:30</span>
+                                                </div>
+                                                <p class="text-gray-600 mt-1">参与"传统文化数字创作"活动</p>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex items-start">
+                                            <div class="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600 mr-3 flex-shrink-0">
+                                                <i class="fa fa-bell text-sm"></i>
+                                            </div>
+                                            <div>
+                                                <div class="flex items-center">
+                                                    <span class="font-medium">系统通知</span>
+                                                    <span class="text-gray-500 text-sm mx-2">·</span>
+                                                    <span class="text-gray-500 text-sm">2025-06-05 14:15</span>
+                                                </div>
+                                                <p class="text-gray-600 mt-1">作品《故宫瑞雪》获得"本月最佳数字艺术品"称号</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-8 flex justify-end space-x-4">
+                            <button type="button" id="cancel-user-details" class="px-6 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">关闭</button>
+                            <button type="button" id="edit-user-from-details" class="px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">编辑用户</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+            <!-- 删除用户确认模态框 -->
+            <div class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden" id="delete-user-modal">
+                <div class="bg-white rounded-2xl w-full max-w-md">
+                    <div class="p-6 border-b border-gray-100">
+                        <h3 class="text-xl font-bold">确认删除用户</h3>
+                    </div>
+                    <div class="p-6">
+                        <p class="text-gray-700 mb-6">
+                            您确定要删除用户"李艺术"吗？此操作不可撤销，将永久删除该用户的所有数据和记录。
+                        </p>
+                        <div class="flex justify-end space-x-4">
+                            <button type="button" id="cancel-delete-user" class="px-6 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">取消</button>
+                            <button type="button" id="confirm-delete-user" class="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">删除</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+            <!-- JavaScript -->
+            <script>
+                // 导航栏滚动效果
+                const navbar = document.getElementById('navbar');
+                window.addEventListener('scroll', () => {
+                    if (window.scrollY > 10) {
+                        navbar.classList.add('bg-white', 'shadow-md');
+                        navbar.classList.remove('glass-effect');
+                    } else {
+                        navbar.classList.remove('bg-white', 'shadow-md');
+                        navbar.classList.add('glass-effect');
+                    }
+                });
+        
+                // 移动端菜单切换
+                const mobileMenuButton = document.getElementById('mobile-menu-button');
+                const mobileMenu = document.getElementById('mobile-menu');
+                
+                mobileMenuButton.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                });
+        
+                // 用户下拉菜单
+                const userMenu = document.getElementById('user-menu');
+                const userButton = document.querySelector('.flex.items-center.space-x-2.px-4.py-2.rounded-full.bg-primary');
+                
+                userButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    userMenu.classList.toggle('hidden');
+                });
+                
+                document.addEventListener('click', () => {
+                    userMenu.classList.add('hidden');
+                });
+        
+                // 模态框控制
+                const addUserButton = document.querySelector('.flex.items-center.space-x-4 button:last-child');
+                const addUserModal = document.getElementById('add-user-modal');
+                const closeAddUserModal = document.getElementById('close-add-user-modal');
+                const cancelAddUser = document.getElementById('cancel-add-user');
+                const addUserForm = document.getElementById('add-user-form');
+                
+                addUserButton.addEventListener('click', () => {
+                    addUserModal.classList.remove('hidden');
+                    document.body.style.overflow = 'hidden';
+                });
+                
+                function closeAddUser() {
+                    addUserModal.classList.add('hidden');
+                    document.body.style.overflow = 'auto';
+                    addUserForm.reset();
+                }
+                
+                closeAddUserModal.addEventListener('click', closeAddUser);
+                cancelAddUser.addEventListener('click', closeAddUser);
+                
+                // 编辑用户模态框
+                const editUserButtons = document.querySelectorAll('.fa-edit').forEach(button => {
+                    button.parentElement.addEventListener('click', () => {
+                        document.getElementById('edit-user-modal').classList.remove('hidden');
+                        document.body.style.overflow = 'hidden';
+                    });
+                });
+                
+                const closeEditUserModal = document.getElementById('close-edit-user-modal');
+                const cancelEditUser = document.getElementById('cancel-edit-user');
+                
+                function closeEditUser() {
+                    document.getElementById('edit-user-modal').classList.add('hidden');
+                    document.body.style.overflow = 'auto';
+                }
+                
+                closeEditUserModal.addEventListener('click', closeEditUser);
+                cancelEditUser.addEventListener('click', closeEditUser);
+                
+                // 从用户详情页编辑用户
+                const editUserFromDetails = document.getElementById('edit-user-from-details');
+                
+                editUserFromDetails.addEventListener('click', () => {
+                    document.getElementById('user-details-modal').classList.add('hidden');
+                    document.getElementById('edit-user-modal').classList.remove('hidden');
+                });
+                
+                // 查看用户详情模态框
+                const viewUserButtons = document.querySelectorAll('.fa-eye').forEach(button => {
+                    button.parentElement.addEventListener('click', () => {
+                        document.getElementById('user-details-modal').classList.remove('hidden');
+                        document.body.style.overflow = 'hidden';
+                    });
+                });
+                
+                const closeUserDetailsModal = document.getElementById('close-user-details-modal');
+                const cancelUserDetails = document.getElementById('cancel-user-details');
+                
+                function closeUserDetails() {
+                    document.getElementById('user-details-modal').classList.add('hidden');
+                    document.body.style.overflow = 'auto';
+                }
+                
+                closeUserDetailsModal.addEventListener('click', closeUserDetails);
+                cancelUserDetails.addEventListener('click', closeUserDetails);
+                
+                // 删除用户模态框
+                const deleteUserButtons = document.querySelectorAll('.fa-trash').forEach(button => {
+                    button.parentElement.addEventListener('click', () => {
+                        document.getElementById('delete-user-modal').classList.remove('hidden');
+                        document.body.style.overflow = 'hidden';
+                    });
+                });
+                
+                const closeDeleteUserModal = document.getElementById('cancel-delete-user');
+                const confirmDeleteUser = document.getElementById('confirm-delete-user');
+                
+                function closeDeleteUser() {
+                    document.getElementById('delete-user-modal').classList.add('hidden');
+                    document.body.style.overflow = 'auto';
+                }
+                
+                closeDeleteUserModal.addEventListener('click', closeDeleteUser);
+                
+                confirmDeleteUser.addEventListener('click', () => {
+                    // 模拟删除操作
+                    alert('用户已成功删除！');
+                    closeDeleteUser();
+                });
+                
+                // 表单提交处理
+                addUserForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    // 模拟添加用户操作
+                    alert('用户添加成功！');
+                    closeAddUser();
+                });
+                
+                document.getElementById('edit-user-form').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    // 模拟更新用户操作
+                    alert('用户信息已更新！');
+                    closeEditUser();
+                });
+        
+                // 初始化图表
+                window.addEventListener('load', () => {
+                    // 用户增长趋势图
+                    const userGrowthCtx = document.getElementById('userGrowthChart').getContext('2d');
+                    const userGrowthChart = new Chart(userGrowthCtx, {
+                        type: 'line',
+                        data: {
+                            labels: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+                            datasets: [{
+                                label: '新增用户',
+                                data: [12, 19, 15, 28, 22, 35, 42],
+                                borderColor: '#6a11cb',
+                                backgroundColor: 'rgba(106, 17, 203, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            }, {
+                                label: '活跃用户',
+                                data: [42, 58, 62, 78, 85, 92, 105],
+                                borderColor: '#2575fc',
+                                backgroundColor: 'rgba(37, 117, 252, 0.1)',
+                                tension: 0.4,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'top',
+                                },
+                                tooltip: {
+                                    mode: 'index',
+                                    intersect: false,
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    grid: {
+                                        color: 'rgba(0, 0, 0, 0.05)'
+                                    }
+                                },
+                                x: {
+                                    grid: {
+                                        display: false
+                                    }
+                                }
+                            }
+                        }
+                    });
+                    
+                    // 用户角色分布图
+                    const userRoleCtx = document.getElementById('userRoleChart').getContext('2d');
+                    const userRoleChart = new Chart(userRoleCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['管理员', '创作者', '收藏家', '策展人'],
+                            datasets: [{
+                                data: [4, 342, 856, 84],
+                                backgroundColor: [
+                                    '#6a11cb',
+                                    '#2575fc',
+                                    '#34d399',
+                                    '#a855f7'
+                                ],
+                                borderWidth: 0
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                }
+                            },
+                            cutout: '70%'
+                        }
+                    });
+                });
+        
+                // 平滑滚动
+                document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                    anchor.addEventListener('click', function (e) {
+                        e.preventDefault();
+                        
+                        const targetId = this.getAttribute('href');
+                        if (targetId === '#') return;
+                        
+                        const targetElement = document.querySelector(targetId);
+                        if (targetElement) {
+                            window.scrollTo({
+                                top: targetElement.offsetTop - 80,
+                                behavior: 'smooth'
+                            });
+                            
+                            // 如果是移动端，点击后关闭菜单
+                            if (!mobileMenu.classList.contains('hidden')) {
+                                mobileMenu.classList.add('hidden');
+                            }
+                        }
+                    });
+                });
+        
+                // 页面加载动画
+                document.addEventListener('DOMContentLoaded', () => {
+                    document.body.classList.add('fade-in');
+                });
+            </script>
+        </body>
+        </html>
