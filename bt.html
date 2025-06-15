@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>市场份额饼图</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#10B981',
+                        accent: '#8B5CF6',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .chart-container {
+                position: relative;
+                width: 100%;
+                max-width: 800px;
+                height: 600px;
+                margin: 0 auto;
+            }
+            .info-card {
+                @apply bg-white rounded-lg shadow-lg p-4 transition-all duration-300 border-l-4;
+            }
+            .hover-scale {
+                @apply transition-transform duration-300 hover:scale-[1.02] hover:shadow-xl;
+            }
+            .pulse {
+                animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            }
+            @keyframes pulse {
+                0%, 100% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: 0.7;
+                }
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen font-sans">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <header class="text-center mb-10">
+            <h1 class="text-[clamp(1.8rem,4vw,2.5rem)] font-bold text-gray-800 mb-2">
+                <i class="fa fa-pie-chart text-primary mr-2"></i>市场份额分析
+            </h1>
+            <p class="text-gray-600 max-w-2xl mx-auto">
+                交互式饼图展示各品牌市场占有率分布情况，将鼠标悬停在任意区域查看详细信息
+            </p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-xl shadow-xl p-6 hover-scale">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold text-gray-800">品牌市场份额</h2>
+                        <div class="text-sm text-gray-500">
+                            <i class="fa fa-info-circle mr-1"></i> 数据更新于 2025-06-16
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="marketShareChart"></canvas>
+                        <div id="tooltip" class="absolute hidden bg-white rounded-lg shadow-lg p-3 text-sm z-10">
+                            <div id="tooltip-title" class="font-semibold"></div>
+                            <div id="tooltip-value" class="text-gray-600"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <div id="infoCard" class="info-card border-l-primary opacity-0 transform transition-all duration-300">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-800 mb-2">
+                                <span id="brandName">请选择品牌</span>
+                            </h3>
+                            <div class="flex items-center mb-3">
+                                <div id="brandColor" class="w-4 h-4 rounded-full mr-2 bg-gray-300"></div>
+                                <span id="brandPercentage" class="text-xl font-bold">0%</span>
+                            </div>
+                        </div>
+                        <div id="brandIcon" class="text-3xl text-gray-300">
+                            <i class="fa fa-mobile"></i>
+                        </div>
+                    </div>
+                    <p class="text-gray-600 text-sm">
+                        <i class="fa fa-bar-chart text-primary mr-1"></i>
+                        <span id="brandValue">市场份额数据</span>
+                    </p>
+                    <div class="mt-4 pt-4 border-t border-gray-100">
+                        <h4 class="text-xs uppercase text-gray-500 font-medium mb-2">市场地位</h4>
+                        <div id="brandStatus" class="text-sm text-gray-700">
+                            选择一个品牌查看详细分析
+                        </div>
+                    </div>
+                    <div class="mt-4 text-xs text-gray-500">
+                        <i class="fa fa-lightbulb-o text-yellow-500 mr-1"></i>
+                        提示：将鼠标悬停在饼图上查看各品牌详细信息
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-xl p-6 hover-scale">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-4">市场份额概览</h2>
+                    <div class="space-y-3" id="legend">
+                        <!-- 图例将通过JavaScript动态生成 -->
+                    </div>
+                    <div class="mt-4 pt-4 border-t border-gray-100">
+                        <h3 class="text-sm font-medium text-gray-700 mb-2">总体市场规模</h3>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-600">总销售额</span>
+                            <span class="font-semibold">¥ 125.3亿</span>
+                        </div>
+                        <div class="flex items-center justify-between mt-1">
+                            <span class="text-gray-600">同比增长</span>
+                            <span class="font-semibold text-green-600">+8.2%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-10 bg-white rounded-xl shadow-xl p-6 hover-scale">
+            <h2 class="text-xl font-semibold text-gray-800 mb-6">市场趋势分析</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="p-4 rounded-lg bg-blue-50 border border-blue-100">
+                    <h3 class="text-sm font-medium text-blue-800 mb-2">市场领导者</h3>
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                            <i class="fa fa-trophy text-blue-500"></i>
+                        </div>
+                        <div>
+                            <div class="text-lg font-semibold">三星</div>
+                            <div class="text-xs text-gray-500">26.0% 市场份额</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4 rounded-lg bg-green-50 border border-green-100">
+                    <h3 class="text-sm font-medium text-green-800 mb-2">增长最快</h3>
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                            <i class="fa fa-line-chart text-green-500"></i>
+                        </div>
+                        <div>
+                            <div class="text-lg font-semibold">华为</div>
+                            <div class="text-xs text-gray-500">同比 +12.3%</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4 rounded-lg bg-purple-50 border border-purple-100">
+                    <h3 class="text-sm font-medium text-purple-800 mb-2">用户满意度</h3>
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center mr-3">
+                            <i class="fa fa-smile-o text-purple-500"></i>
+                        </div>
+                        <div>
+                            <div class="text-lg font-semibold">Apple</div>
+                            <div class="text-xs text-gray-500">满意度 92.7%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="mt-12 text-center text-gray-500 text-sm">
+            <p>© 2025 市场分析系统 | 使用 <i class="fa fa-heart text-red-500"></i> 开发</p>
+        </footer>
+    </div>
+
+    <script>
+        // 数据
+        const data = [
+            { title: "Apple", value: 0.24, color: "#10B981", icon: "fa-apple" }, // 绿色
+            { title: "三星", value: 0.26, color: "#3B82F6", icon: "fa-android" }, // 蓝色
+            { title: "华为", value: 0.13, color: "#F59E0B", icon: "fa-mobile" }, // 橙色
+            { title: "锤子", value: 0.17, color: "#EF4444", icon: "fa-cube" }, // 红色
+            { title: "小米", value: 0.08, color: "#8B5CF6", icon: "fa-shield" }, // 紫色
+            { title: "其他", value: 0.12, color: "#06B6D4", icon: "fa-ellipsis-h" }, // 青色
+        ];
+
+        // 市场地位描述
+        const statusDescriptions = [
+            "全球领先的科技公司，以创新设计和高端产品线占据市场重要份额。",
+            "市场占有率第一，凭借多元化的产品线和广泛的市场覆盖保持领先地位。",
+            "近年来增长迅速，凭借5G技术和高端产品线不断扩大市场份额。",
+            "专注于创新设计和用户体验，拥有稳定的用户群体和品牌忠诚度。",
+            "以高性价比产品著称，在中低端市场具有较强竞争力。",
+            "包括众多本土品牌和新兴势力，共同占据一定的市场份额。"
+        ];
+
+        // 初始化画布
+        const canvas = document.getElementById('marketShareChart');
+        const ctx = canvas.getContext('2d');
+        let canvasWidth = canvas.clientWidth;
+        let canvasHeight = canvas.clientHeight;
+        let cx, cy, r;
+        
+        // 工具提示
+        const tooltip = document.getElementById('tooltip');
+        const tooltipTitle = document.getElementById('tooltip-title');
+        const tooltipValue = document.getElementById('tooltip-value');
+
+        // 信息卡片
+        const infoCard = document.getElementById('infoCard');
+        const brandName = document.getElementById('brandName');
+        const brandColor = document.getElementById('brandColor');
+        const brandPercentage = document.getElementById('brandPercentage');
+        const brandValue = document.getElementById('brandValue');
+        const brandIcon = document.getElementById('brandIcon');
+        const brandStatus = document.getElementById('brandStatus');
+
+        // 图例容器
+        const legendContainer = document.getElementById('legend');
+
+        // 响应式处理
+        function updateCanvasDimensions() {
+            canvasWidth = canvas.parentElement.clientWidth;
+            canvasHeight = 500; // 固定高度
+            
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+            
+            cx = canvasWidth / 2;
+            cy = canvasHeight / 2;
+            r = Math.min(canvasWidth, canvasHeight) * 0.35;
+            
+            drawChart(-1); // 重绘图表
+        }
+
+        // 绘制图表
+        function drawChart(hoverIndex) {
+            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+            
+            let beginAngle = Math.PI / 6; // 起始角度
+            
+            // 绘制背景圆环
+            ctx.beginPath();
+            ctx.arc(cx, cy, r * 1.05, 0, 2 * Math.PI);
+            ctx.fillStyle = '#f9fafb';
+            ctx.fill();
+            
+            // 绘制阴影
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
+            ctx.shadowBlur = 15;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 8;
+            
+            // 绘制饼图
+            data.forEach((item, index) => {
+                const angle = item.value * 2 * Math.PI;
+                const endAngle = beginAngle + angle;
+                
+                // 高亮选中的扇区
+                const radius = index === hoverIndex ? r * 1.08 : r;
+                
+                // 绘制扇区
+                ctx.beginPath();
+                ctx.moveTo(cx, cy);
+                ctx.arc(cx, cy, radius, beginAngle, endAngle);
+                ctx.closePath();
+                
+                // 渐变填充
+                const gradient = ctx.createRadialGradient(
+                    cx, cy, radius * 0.3,
+                    cx, cy, radius
+                );
+                gradient.addColorStop(0, lightenColor(item.color, 20));
+                gradient.addColorStop(1, item.color);
+                
+                ctx.fillStyle = gradient;
+                ctx.fill();
+                
+                // 绘制边框
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = 'white';
+                ctx.stroke();
+                
+                // 保存角度信息用于鼠标交互
+                item.beginAngle = beginAngle;
+                item.endAngle = endAngle;
+                
+                beginAngle = endAngle;
+            });
+            
+            // 重置阴影
+            ctx.shadowColor = 'transparent';
+            
+            // 绘制中心圆
+            ctx.beginPath();
+            ctx.arc(cx, cy, r * 0.2, 0, 2 * Math.PI);
+            ctx.fillStyle = 'white';
+            ctx.fill();
+            
+            // 绘制中心文本
+            ctx.font = 'bold 16px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = '#333';
+            ctx.fillText('市场份额分布', cx, cy);
+            
+            // 绘制连接线和标签
+            drawLabels(hoverIndex);
+            
+            // 绘制图例
+            createLegend();
+        }
+
+        // 绘制标签和连接线
+        function drawLabels(hoverIndex) {
+            let beginAngle = Math.PI / 6;
+            
+            data.forEach((item, index) => {
+                const angle = item.value * 2 * Math.PI;
+                const midAngle = beginAngle + angle / 2;
+                
+                // 计算标签位置
+                const labelRadius = r * 1.2;
+                const labelX = cx + labelRadius * Math.cos(midAngle);
+                const labelY = cy + labelRadius * Math.sin(midAngle);
+                
+                // 高亮选中的标签
+                const isHighlighted = index === hoverIndex;
+                const textSize = isHighlighted ? 14 : 12;
+                
+                // 绘制连接线
+                ctx.beginPath();
+                ctx.moveTo(cx + r * 1.05 * Math.cos(midAngle), cy + r * 1.05 * Math.sin(midAngle));
+                ctx.lineTo(labelX - 15 * Math.sign(Math.cos(midAngle)), labelY);
+                ctx.lineWidth = 1;
+                ctx.strokeStyle = '#e5e7eb';
+                ctx.stroke();
+                
+                // 绘制标签背景
+                ctx.beginPath();
+                ctx.rect(
+                    labelX - 5, 
+                    labelY - textSize / 2 - 5, 
+                    item.title.length * textSize * 0.6 + 10, 
+                    textSize + 10
+                );
+                ctx.fillStyle = isHighlighted ? '#f3f4f6' : 'rgba(243, 244, 246, 0.8)';
+                ctx.fill();
+                ctx.lineWidth = 1;
+                ctx.strokeStyle = isHighlighted ? '#d1d5db' : 'rgba(209, 213, 219, 0.5)';
+                ctx.stroke();
+                
+                // 绘制标签文本
+                ctx.font = `${isHighlighted ? 'bold' : 'normal'} ${textSize}px Inter, sans-serif`;
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'middle';
+                ctx.fillStyle = isHighlighted ? '#1f2937' : '#4b5563';
+                ctx.fillText(
+                    `${item.title} (${(item.value * 100).toFixed(1)}%)`, 
+                    labelX, 
+                    labelY
+                );
+                
+                beginAngle += angle;
+            });
+        }
+
+        // 创建图例
+        function createLegend() {
+            legendContainer.innerHTML = '';
+            
+            data.forEach((item, index) => {
+                const legendItem = document.createElement('div');
+                legendItem.className = 'flex items-center justify-between';
+                
+                const leftSection = document.createElement('div');
+                leftSection.className = 'flex items-center';
+                
+                const colorBox = document.createElement('div');
+                colorBox.className = 'w-3 h-3 rounded-full mr-2';
+                colorBox.style.backgroundColor = item.color;
+                
+                const text = document.createElement('span');
+                text.className = 'text-sm text-gray-700';
+                text.textContent = item.title;
+                
+                const percentage = document.createElement('span');
+                percentage.className = 'text-sm font-medium text-gray-900';
+                percentage.textContent = `${(item.value * 100).toFixed(1)}%`;
+                
+                leftSection.appendChild(colorBox);
+                leftSection.appendChild(text);
+                legendItem.appendChild(leftSection);
+                legendItem.appendChild(percentage);
+                
+                legendContainer.appendChild(legendItem);
+            });
+        }
+
+        // 鼠标移动事件
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            // 计算鼠标相对于圆心的角度
+            const a = x - cx;
+            const b = y - cy;
+            let ang = Math.atan2(b, a);
+            
+            // 确保角度在0到2π之间
+            if (ang < 0) ang += 2 * Math.PI;
+            
+            // 计算到圆心的距离
+            const dist = Math.sqrt(a * a + b * b);
+            
+            let hoverIndex = -1;
+            
+            // 检查是否在饼图内并确定悬停的扇区
+            if (dist <= r * 1.08) {
+                for (let i = 0; i < data.length; i++) {
+                    if (ang >= data[i].beginAngle && ang <= data[i].endAngle) {
+                        hoverIndex = i;
+                        break;
+                    }
+                }
+            }
+            
+            // 更新信息卡片
+            if (hoverIndex !== -1) {
+                const item = data[hoverIndex];
+                brandName.textContent = item.title;
+                brandColor.style.backgroundColor = item.color;
+                brandPercentage.textContent = `${(item.value * 100).toFixed(1)}%`;
+                brandValue.textContent = `占据 ${(item.value * 100).toFixed(1)}% 的市场份额，约 ¥${(item.value * 125.3).toFixed(1)}亿`;
+                
+                // 更新图标
+                brandIcon.innerHTML = `<i class="fa ${item.icon} text-3xl" style="color: ${item.color}"></i>`;
+                
+                // 更新市场地位描述
+                brandStatus.textContent = statusDescriptions[hoverIndex];
+                
+                // 添加动画效果
+                infoCard.style.opacity = '1';
+                infoCard.style.transform = 'translateY(0)';
+                infoCard.style.borderLeftColor = item.color;
+                
+                // 显示工具提示
+                tooltipTitle.textContent = item.title;
+                tooltipValue.textContent = `${(item.value * 100).toFixed(1)}% 市场份额`;
+                tooltip.style.left = `${e.clientX + 10}px`;
+                tooltip.style.top = `${e.clientY + 10}px`;
+                tooltip.style.display = 'block';
+            } else {
+                // 淡出效果
+                infoCard.style.opacity = '0.5';
+                infoCard.style.transform = 'translateY(5px)';
+                
+                // 隐藏工具提示
+                tooltip.style.display = 'none';
+            }
+            
+            // 重绘图表
+            drawChart(hoverIndex);
+        });
+
+        // 鼠标离开事件
+        canvas.addEventListener('mouseleave', () => {
+            drawChart(-1);
+            infoCard.style.opacity = '0.5';
+            infoCard.style.transform = 'translateY(5px)';
+            tooltip.style.display = 'none';
+        });
+
+        // 辅助函数：变亮颜色
+        function lightenColor(color, percent) {
+            // 去除#号
+            color = color.replace('#', '');
+            
+            // 解析RGB值
+            let r = parseInt(color.substring(0, 2), 16);
+            let g = parseInt(color.substring(2, 4), 16);
+            let b = parseInt(color.substring(4, 6), 16);
+            
+            // 计算变亮后的RGB值
+            r = Math.min(255, Math.round(r * (1 + percent / 100)));
+            g = Math.min(255, Math.round(g * (1 + percent / 100)));
+            b = Math.min(255, Math.round(b * (1 + percent / 100)));
+            
+            // 转换回十六进制
+            const toHex = (c) => {
+                const hex = c.toString(16);
+                return hex.length === 1 ? '0' + hex : hex;
+            };
+            
+            return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+        }
+
+        // 初始化
+        window.addEventListener('resize', updateCanvasDimensions);
+        updateCanvasDimensions();
+        createLegend();
+        
+        // 初始动画
+        setTimeout(() => {
+            infoCard.style.opacity = '0.5';
+            infoCard.style.transform = 'translateY(0)';
+        }, 300);
+    </script>
+</body>
+</html>
+    
