@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>宋昕烨的简历</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#69B1FF',
+                        accent: '#36D399',
+                        dark: '#1E293B',
+                        light: '#F8FAFC'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                },
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .text-shadow-lg {
+                text-shadow: 0 4px 8px rgba(0,0,0,0.12), 0 2px 4px rgba(0,0,0,0.08);
+            }
+            .bg-blur {
+                backdrop-filter: blur(8px);
+            }
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+            }
+            .scrollbar-hide {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            .animate-fade-in {
+                animation: fadeIn 0.8s ease-in-out forwards;
+            }
+            .animate-slide-up {
+                animation: slideUp 0.8s ease-out forwards;
+            }
+            .animate-scale {
+                animation: scale 0.5s ease-out forwards;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(40px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes scale {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="font-inter bg-light text-dark antialiased overflow-x-hidden">
+    <!-- Canvas 背景 -->
+    <canvas id="canvas-bg" class="fixed top-0 left-0 w-full h-full -z-10"></canvas>
+    
+    <!-- 导航栏 -->
+    <nav id="navbar" class="fixed top-0 left-0 w-full py-4 transition-all duration-300 z-50">
+        <div class="container mx-auto px-4 md:px-8 flex justify-between items-center">
+            <div class="text-xl font-bold text-white text-shadow">宋昕烨</div>
+            <div class="hidden md:flex space-x-8">
+                <a href="#education" class="text-white hover:text-accent transition-colors">教育背景</a>
+                <a href="#projects" class="text-white hover:text-accent transition-colors">项目经历</a>
+                <a href="#internship" class="text-white hover:text-accent transition-colors">实习经历</a>
+                <a href="#skills" class="text-white hover:text-accent transition-colors">技能证书</a>
+            </div>
+            <button class="md:hidden text-white text-2xl">
+                <i class="fa fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+    
+    <!-- 移动导航菜单 -->
+    <div id="mobile-menu" class="fixed inset-0 bg-dark/95 z-50 flex flex-col justify-center items-center transform translate-x-full transition-transform duration-300 md:hidden">
+        <button id="close-menu" class="absolute top-6 right-6 text-white text-2xl">
+            <i class="fa fa-times"></i>
+        </button>
+        <div class="flex flex-col space-y-8 text-center">
+            <a href="#education" class="text-white text-xl hover:text-accent transition-colors">教育背景</a>
+            <a href="#projects" class="text-white text-xl hover:text-accent transition-colors">项目经历</a>
+            <a href="#internship" class="text-white text-xl hover:text-accent transition-colors">实习经历</a>
+            <a href="#skills" class="text-white text-xl hover:text-accent transition-colors">技能证书</a>
+        </div>
+    </div>
+    
+    <!-- 英雄区域 -->
+    <section id="hero" class="min-h-screen flex items-center justify-center relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-b from-primary/80 to-dark/90 z-0"></div>
+        <div class="container mx-auto px-4 py-24 md:py-32 relative z-10">
+            <div class="max-w-3xl mx-auto text-center">
+                <div class="mb-8 animate-fade-in opacity-0" style="animation-delay: 0.2s">
+                    <img src="https://yequ0304.github.io/20250609224838.jpg" alt="宋昕烨" class="w-40 h-40 md:w-56 md:h-56 rounded-full mx-auto border-4 border-white/20 shadow-lg animate-float">
+                </div>
+                <h1 class="text-[clamp(2.5rem,5vw,4rem)] font-bold text-white mb-4 text-shadow-lg animate-fade-in opacity-0" style="animation-delay: 0.4s">
+                    宋昕烨
+                </h1>
+                <p class="text-[clamp(1.2rem,2vw,1.5rem)] text-white/90 mb-8 max-w-2xl mx-auto animate-fade-in opacity-0" style="animation-delay: 0.6s">
+                    信息管理与信息系统专业 | 数据分析师 | 技术爱好者
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6 animate-fade-in opacity-0" style="animation-delay: 0.8s">
+                    <a href="tel:13623676129" class="px-6 py-3 bg-white/10 hover:bg-white/20 text-white border border-white/30 rounded-full transition-all hover:shadow-lg flex items-center justify-center gap-2">
+                        <i class="fa fa-phone"></i> 13623676129
+                    </a>
+                    <a href="mailto:13623676129@163.com" class="px-6 py-3 bg-white/10 hover:bg-white/20 text-white border border-white/30 rounded-full transition-all hover:shadow-lg flex items-center justify-center gap-2">
+                        <i class="fa fa-envelope"></i> 13623676129@163.com
+                    </a>
+                </div>
+                <div class="mt-16 animate-fade-in opacity-0" style="animation-delay: 1s">
+                    <a href="#education" class="inline-block text-white/80 hover:text-white transition-colors">
+                        <span class="block mb-2 text-sm">向下滚动了解更多</span>
+                        <i class="fa fa-chevron-down animate-bounce"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 教育背景 -->
+    <section id="education" class="py-24 bg-white relative">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16 reveal-element">
+                <h2 class="text-[clamp(1.8rem,3vw,2.5rem)] font-bold text-dark mb-4">教育背景</h2>
+                <div class="w-20 h-1 bg-primary mx-auto rounded-full"></div>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-xl p-8 md:p-10 reveal-element">
+                <div class="flex flex-col md:flex-row gap-8 items-start md:items-center mb-6">
+                    <div class="w-full md:w-1/3">
+                        <span class="text-primary font-bold text-xl">2023.09 ~ 2027.06</span>
+                    </div>
+                    <div class="w-full md:w-2/3">
+                        <h3 class="text-2xl font-bold mb-2">上海对外经贸大学</h3>
+                        <p class="text-gray-600 mb-4">信息管理与信息系统专业（本科） | GPA：3.3/4.0（专业前30%）</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <h4 class="font-bold text-sm uppercase text-gray-500 mb-2">主修课程</h4>
+                                <ul class="space-y-1 text-gray-700">
+                                    <li class="flex items-center">
+                                        <i class="fa fa-check-circle text-primary mr-2"></i>
+                                        数据结构（满绩）
+                                    </li>
+                                    <li class="flex items-center">
+                                        <i class="fa fa-check-circle text-primary mr-2"></i>
+                                        高等数学（满绩）
+                                    </li>
+                                    <li class="flex items-center">
+                                        <i class="fa fa-check-circle text-primary mr-2"></i>
+                                        python（88分）
+                                    </li>
+                                    <li class="flex items-center">
+                                        <i class="fa fa-check-circle text-primary mr-2"></i>
+                                        c语言程序设计
+                                    </li>
+                                    <li class="flex items-center">
+                                        <i class="fa fa-check-circle text-primary mr-2"></i>
+                                        英语读写（满绩）
+                                    </li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm uppercase text-gray-500 mb-2">所获奖项</h4>
+                                <ul class="space-y-1 text-gray-700">
+                                    <li class="flex items-center">
+                                        <i class="fa fa-trophy text-yellow-500 mr-2"></i>
+                                        校级一等奖学金
+                                    </li>
+                                    <li class="flex items-center">
+                                        <i class="fa fa-trophy text-yellow-500 mr-2"></i>
+                                        团委学生会优秀部长
+                                    </li>
+                                    <li class="flex items-center">
+                                        <i class="fa fa-trophy text-yellow-500 mr-2"></i>
+                                        物流设计大赛三等奖
+                                    </li>
+                                    <li class="flex items-center">
+                                        <i class="fa fa-trophy text-yellow-500 mr-2"></i>
+                                        大学生创新创业国家级项目2项
+                                    </li>
+                                    <li class="flex items-center">
+                                        <i class="fa fa-trophy text-yellow-500 mr-2"></i>
+                                        美国大学生数学建模竞赛S奖
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 项目经历 -->
+    <section id="projects" class="py-24 bg-gray-50 relative">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16 reveal-element">
+                <h2 class="text-[clamp(1.8rem,3vw,2.5rem)] font-bold text-dark mb-4">项目经历</h2>
+                <div class="w-20 h-1 bg-primary mx-auto rounded-full"></div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- 项目1 -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow reveal-element">
+                    <div class="h-48 bg-primary/10 relative">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <i class="fa fa-line-chart text-6xl text-primary/30"></i>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-xl font-bold">访万企，读中国项目</h3>
+                            <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium">2024.03 - 2024.09</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">牵头完成300份企业问卷发放（有效回收率83%），运用Python清洗数据（异常值处理率90%），构建线性回归模型（R²=0.82），量化新质生产力对企业竞争力的边际效应。</p>
+                        <div class="space-y-2 mb-4">
+                            <div class="flex items-center">
+                                <i class="fa fa-database text-primary mr-2"></i>
+                                <span class="text-gray-700">Python数据处理</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fa fa-chart-line text-primary mr-2"></i>
+                                <span class="text-gray-700">线性回归模型</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fa fa-file-text text-primary mr-2"></i>
+                                <span class="text-gray-700">论文撰写</span>
+                            </div>
+                        </div>
+                        <button class="project-details-btn w-full py-2 border border-primary text-primary hover:bg-primary hover:text-white transition-colors rounded-lg" data-project="project1">
+                            查看详情
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 项目2 -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow reveal-element">
+                    <div class="h-48 bg-secondary/10 relative">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <i class="fa fa-paint-brush text-6xl text-secondary/30"></i>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-xl font-bold">大学生创新创业训练项目</h3>
+                            <span class="bg-secondary/10 text-secondary px-3 py-1 rounded-full text-sm font-medium">2024.03 - 2025.03</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">开发「射艺+新媒体」教学模式：线上线下结合教学，覆盖100+学员，教学满意度达95%，主导文化IP商业化落地，通过Python分析500+市场调研数据，策划3场主题市集活动，非遗衍生品转化率高达15%。</p>
+                        <div class="space-y-2 mb-4">
+                            <div class="flex items-center">
+                                <i class="fa fa-users text-secondary mr-2"></i>
+                                <span class="text-gray-700">教学模式开发</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fa fa-shopping-cart text-secondary mr-2"></i>
+                                <span class="text-gray-700">商业化运营</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fa fa-bar-chart text-secondary mr-2"></i>
+                                <span class="text-gray-700">数据分析</span>
+                            </div>
+                        </div>
+                        <button class="project-details-btn w-full py-2 border border-secondary text-secondary hover:bg-secondary hover:text-white transition-colors rounded-lg" data-project="project2">
+                            查看详情
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 项目3 -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow reveal-element">
+                    <div class="h-48 bg-accent/10 relative">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <i class="fa fa-eye text-6xl text-accent/30"></i>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-xl font-bold">大学生创新创业训练项目</h3>
+                            <span class="bg-accent/10 text-accent px-3 py-1 rounded-full text-sm font-medium">2025.01 - 2025.05</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">设计多模态数据采集方案，通过Python爬虫日均抓取微博/抖音/小红书数据10,000+条，清洗后构建舆情分析模型，F1值达0.82（高于行业基准12%），情绪识别误差<±7%。</p>
+                        <div class="space-y-2 mb-4">
+                            <div class="flex items-center">
+                                <i class="fa fa-spider text-accent mr-2"></i>
+                                <span class="text-gray-700">网络爬虫</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fa fa-comments text-accent mr-2"></i>
+                                <span class="text-gray-700">舆情分析</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fa fa-chart-pie text-accent mr-2"></i>
+                                <span class="text-gray-700">数据可视化</span>
+                            </div>
+                        </div>
+                        <button class="project-details-btn w-full py-2 border border-accent text-accent hover:bg-accent hover:text-white transition-colors rounded-lg" data-project="project3">
+                            查看详情
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- 项目4 -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow reveal-element">
+                    <div class="h-48 bg-dark/10 relative">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <i class="fa fa-link text-6xl text-dark/30"></i>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-xl font-bold">大学生创新创业训练项目</h3>
+                            <span class="bg-dark/10 text-dark px-3 py-1 rounded-full text-sm font-medium">2024.03 - 2025.03</span>
+                        </div>
+                        <p class="text-gray-600 mb-4">基于Python数据处理模块，完成2,000+条历史文献数据清洗，构建结构化知识图谱。整合用户交互数据，分析行为路径并生成可视化报告，支撑产品迭代决策，提升数据分析效率30%。</p>
+                        <div class="space-y-2 mb-4">
+                            <div class="flex items-center">
+                                <i class="fa fa-database text-dark mr-2"></i>
+                                <span class="text-gray-700">数据处理</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fa fa-sitemap text-dark mr-2"></i>
+                                <span class="text-gray-700">知识图谱</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fa fa-chain text-dark mr-2"></i>
+                                <span class="text-gray-700">区块链技术</span>
+                            </div>
+                        </div>
+                        <button class="project-details-btn w-full py-2 border border-dark text-dark hover:bg-dark hover:text-white transition-colors rounded-lg" data-project="project4">
+                            查看详情
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 项目5 -->
+            <div class="mt-8 bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow reveal-element">
+                <div class="h-64 bg-primary/10 relative">
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <i class="fa fa-truck text-8xl text-primary/30"></i>
+                    </div>
+                </div>
+                <div class="p-6 md:p-8">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
+                        <h3 class="text-2xl font-bold mb-2 md:mb-0">"吴兴杯"物流设计大赛</h3>
+                        <span class="bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium">2024.04 - 2025.05</span>
+                    </div>
+                    <p class="text-gray-600 mb-6">项目描述：吴兴镇重装产业布料供应链优化，构建"智能仓储+多级库存协同"模型，解决布料供应链"牛鞭效应"，运用算法优化配送路径，降低仓储成本18%，订单响应提速30%，整合供应商-生产端数据，减少冗余库存25%。</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <h4 class="font-bold text-sm uppercase text-gray-500 mb-3">责任描述</h4>
+                            <ul class="space-y-2 text-gray-700">
+                                <li class="flex items-start">
+                                    <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                                    <span>模型开发：设计多级库存协同机制，动态平衡供需波动</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                                    <span>算法应用：Python算法求解最优配送方案</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                                    <span>成效验证：仿真模拟验证成本与时效优化，输出标准化方案</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                                    <span>获得校级和市级立项获得上海对外经贸大学物流设计大赛三等奖</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-sm uppercase text-gray-500 mb-3">技术工具</h4>
+                            <ul class="space-y-2 text-gray-700">
+                                <li class="flex items-start">
+                                    <i class="fa fa-code text-primary mt-1 mr-2"></i>
+                                    <span>Python (Pandas/NumPy)</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-cubes text-primary mt-1 mr-2"></i>
+                                    <span>智能仓储模型</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-chart-area text-primary mt-1 mr-2"></i>
+                                    <span>供应链优化算法</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-file-text text-primary mt-1 mr-2"></i>
+                                    <span>论文撰写</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 实习经历 -->
+    <section id="internship" class="py-24 bg-white relative">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16 reveal-element">
+                <h2 class="text-[clamp(1.8rem,3vw,2.5rem)] font-bold text-dark mb-4">实习经历</h2>
+                <div class="w-20 h-1 bg-primary mx-auto rounded-full"></div>
+            </div>
+            
+            <div class="relative">
+                <!-- 时间线 -->
+                <div class="absolute left-0 md:left-1/2 top-0 bottom-0 w-1 bg-gray-200 transform md:translate-x-[-50%]"></div>
+                
+                <!-- 实习1 -->
+                <div class="relative mb-12 reveal-element">
+                    <div class="flex flex-col md:flex-row items-center">
+                        <div class="order-2 md:order-1 w-full md:w-1/2 md:pr-12 md:text-right">
+                            <div class="bg-white rounded-xl shadow-lg p-6 md:p-8 hover:shadow-xl transition-shadow">
+                                <h3 class="text-xl font-bold mb-2">上海顶程教育科技有限公司</h3>
+                                <p class="text-gray-600 mb-4">线上线下精准触达500+潜在客户，邀约咨询满意度95%，完成5家竞品实地调研+3家线上竞品分析，基于Python处理500+份数据优化产品策略，策划3场高转化线下活动（转化率20%），搭建小红书账号实现单篇阅读量破百，从0组建15人团队，制定标准化流程，连续3个月业绩第一。</p>
+                                
+                                <div class="mt-4">
+                                    <h4 class="font-bold text-sm uppercase text-gray-500 mb-2">责任描述</h4>
+                                    <ul class="space-y-1 text-gray-700">
+                                        <li class="flex items-center">
+                                            <i class="fa fa-database text-primary mr-2"></i>
+                                            <span>数据分析：Python清洗分析市场数据，输出用户画像及竞品对标报告</span>
+                                        </li>
+                                        <li class="flex items-center">
+                                            <i class="fa fa-users text-primary mr-2"></i>
+                                            <span>团队管理：搭建考核体系，数据化工具赋能团队，目标拆解与动态策略调整</span>
+                                        </li>
+                                        <li class="flex items-center">
+                                            <i class="fa fa-trophy text-primary mr-2"></i>
+                                            <span>获得先进实习生表彰</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="order-1 md:order-2 flex justify-center mb-4 md:mb-0">
+                            <div class="bg-primary text-white rounded-full w-12 h-12 flex items-center justify-center shadow-lg z-10">
+                                <i class="fa fa-briefcase"></i>
+                            </div>
+                        </div>
+                        <div class="order-3 w-full md:w-1/2 md:pl-12 hidden md:block"></div>
+                    </div>
+                    <div class="flex justify-center md:hidden mt-2">
+                        <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium">2025.03 - 2025.06</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 技能证书 -->
+    <section id="skills" class="py-24 bg-gray-50 relative">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16 reveal-element">
+                <h2 class="text-[clamp(1.8rem,3vw,2.5rem)] font-bold text-dark mb-4">技能证书</h2>
+                <div class="w-20 h-1 bg-primary mx-auto rounded-full"></div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white rounded-xl shadow-lg p-6 md:p-8 reveal-element">
+                    <h3 class="text-xl font-bold mb-6 flex items-center">
+                        <i class="fa fa-code text-primary mr-3"></i>
+                        技术技能
+                    </h3>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="font-medium">Python数据处理</span>
+                                <span class="text-primary">90%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-primary h-2 rounded-full" style="width: 90%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="font-medium">数据分析与建模</span>
+                                <span class="text-primary">85%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-primary h-2 rounded-full" style="width: 85%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="font-medium">Web开发基础</span>
+                                <span class="text-primary">75%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-primary h-2 rounded-full" style="width: 75%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="font-medium">区块链应用</span>
+                                <span class="text-primary">70%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-primary h-2 rounded-full" style="width: 70%"></div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-between mb-2">
+                                <span class="font-medium">数据可视化</span>
+                                <span class="text-primary">80%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-primary h-2 rounded-full" style="width: 80%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-lg p-6 md:p-8 reveal-element">
+                    <h3 class="text-xl font-bold mb-6 flex items-center">
+                        <i class="fa fa-certificate text-primary mr-3"></i>
+                        证书与荣誉
+                    </h3>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <div class="bg-primary/10 p-3 rounded-lg mr-4">
+                                <i class="fa fa-trophy text-primary text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold">数学建模竞赛Python应用</h4>
+                                <p class="text-gray-600">在数学建模竞赛中应用Python训练预测模型，获得校级证书</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="bg-primary/10 p-3 rounded-lg mr-4">
+                                <i class="fa fa-users text-primary text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold">团队协作与项目管理</h4>
+                                <p class="text-gray-600">负责4个校级项目，擅长沟通协作，输出中英文文档2+份</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="bg-primary/10 p-3 rounded-lg mr-4">
+                                <i class="fa fa-language text-primary text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold">英语能力</h4>
+                                <p class="text-gray-600">通过大学英语四级考试</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="bg-primary/10 p-3 rounded-lg mr-4">
+                                <i class="fa fa-tools text-primary text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold">工具掌握</h4>
+                                <p class="text-gray-600">掌握Chat GPT, Deepseek, PPT, Excel数据处理与分析，SWOT分析框架等工具</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-6 md:mb-0">
+                    <h3 class="text-2xl font-bold mb-2">宋昕烨</h3>
+                    <p class="text-gray-400">信息管理与信息系统专业</p>
+                </div>
+                
+                <div class="flex space-x-6 mb-6 md:mb-0">
+                    <a href="tel:13623676129" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="fa fa-phone text-xl"></i>
+                    </a>
+                    <a href="mailto:13623676129@163.com" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="fa fa-envelope text-xl"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-500">
+                <p>&copy; 2025 宋昕烨 - 个人简历</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- 项目详情模态框 -->
+    <div id="project-modal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto mx-4 animate-scale">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 id="modal-title" class="text-2xl font-bold"></h3>
+                    <button id="close-modal" class="text-gray-500 hover:text-gray-700">
+                        <i class="fa fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div id="modal-content" class="space-y-4"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 项目详情数据
+        const projectDetails = {
+            project1: {
+                title: "访万企，读中国项目",
+                content: `
+                    <div class="space-y-4">
+                        <p class="text-gray-700">
+                            该项目聚焦于新质生产力对企业竞争力的影响研究，通过大规模问卷调研和数据分析，量化了新质生产力各要素对企业竞争力的边际效应，为企业转型升级提供数据支持。
+                        </p>
+                        <div>
+                            <h4 class="font-bold text-lg mb-2">项目职责</h4>
+                            <ul class="space-y-2 text-gray-700">
+                                <li class="flex items-start">
+                                    <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                                    <span>设计问卷调研方案，完成300份企业问卷发放与回收，有效回收率83%</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                                    <span>运用Python进行数据清洗，处理异常值比例达90%</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                                    <span>构建线性回归模型，R²值达0.82，通过回归筛选5项核心变量，解释力占比75%</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                                    <span>提出"技术研发投入强度>0.5%"为竞争力提升临界点的重要结论</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                                    <span>撰写论文《新质生产力对企业竞争力及风险能力提升的影响研究》</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-2">项目成果</h4>
+                            <ul class="space-y-2 text-gray-700">
+                                <li class="flex items-start">
+                                    <i class="fa fa-trophy text-primary mt-1 mr-2"></i>
+                                    <span>获得上海对外经贸大学"访万企，读中国"项目二等奖</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-line-chart text-primary mt-1 mr-2"></i>
+                                    <span>研究成果被多家企业采纳，用于指导战略决策</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-2">技术工具</h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">Python</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">Pandas</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">NumPy</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">Scikit-learn</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">Matplotlib</span>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            project2: {
+                title: "大学生创新创业训练项目",
+                content: `
+                    <div class="space-y-4">
+                        <p class="text-gray-700">
+                            本项目致力于将传统射艺与新媒体技术相结合，探索非遗文化的创新传承模式。通过线上线下结合的教学方式和数据分析驱动的商业化策略，成功实现了文化IP的有效传播与转化。
+                        </p>
+                        <div>
+                            <h4 class="font-bold text-lg mb-2">项目职责</h4>
+                            <ul class="space-y-2 text-gray-700">
+                                <li class="flex items-start">
+                                    <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                                    <span>设计「射艺+新媒体」创新教学模式，线上线下结合覆盖100+学员，教学满意度达95%</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                                    <span>主导文化IP商业化落地，通过Python分析500+市场调研数据，策划3场主题市集活动</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                                    <span>非遗衍生品转化率高达15%，显著高于行业平均水平</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                                    <span>搭建微信公众号+B站双平台宣传矩阵，推文平均阅读量破百，单条短视频观看量达到13000+次</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                                    <span>撰写《问道九州-商文旅体结合的新消费情景》论文</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-2">项目成果</h4>
+                            <ul class="space-y-2 text-gray-700">
+                                <li class="flex items-start">
+                                    <i class="fa fa-trophy text-primary mt-1 mr-2"></i>
+                                    <span>获得市级大学生创新创业训练计划立项</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-users text-primary mt-1 mr-2"></i>
+                                    <span>培养了一批对传统射艺有浓厚兴趣的年轻学员</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-line-chart text-primary mt-1 mr-2"></i>
+                                    <span>形成了一套可复制的非遗文化创新传承模式</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-2">技术工具</h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">Python</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">数据分析</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">微信公众号</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">B站</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">内容运营</span>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            project3: {
+                title: "大学生创新创业训练项目",
+                content: `
+                    <div class="space-y-4">
+                        <p class="text-gray-700">
+                            本项目聚焦于社交媒体舆情分析，通过多模态数据采集与分析技术，构建了一套高效的舆情监测与预警系统，为企业和政府部门提供决策支持。
+                        </p>
+                        <div>
+                            <h4 class="font-bold text-lg mb-2">项目职责</h4>
+                            <ul class="space-y-2 text-gray-700">
+                                <li class="flex items-start">
+                                    <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                                    <span>设计多模态数据采集方案，通过Python爬虫日均抓取微博/抖音/小红书数据10,000+条</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                                    <span>构建舆情分析模型，F1值达0.82（高于行业基准12%），情绪识别误差<±7%</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                                    <span>整合文本、图像、视频数据，舆情预警准确率提升至89%，覆盖95%+热点事件</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                                    <span>基于Tableau构建用户行为路径可视化看板，输出1份分析报告，驱动产品迭代4次</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                                    <span>撰写《慧眼舆情——多模态舆情分析与预警系统》论文</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-2">项目成果</h4>
+                            <ul class="space-y-2 text-gray-700">
+                                <li class="flex items-start">
+                                    <i class="fa fa-trophy text-primary mt-1 mr-2"></i>
+                                    <span>获得国家级大学生创新创业训练计划立项</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-line-chart text-primary mt-1 mr-2"></i>
+                                    <span>用户舆情监控效率提升35%，为企业决策提供有力支持</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-2">技术工具</h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">Python</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">网络爬虫</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">自然语言处理</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">深度学习</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">Tableau</span>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            project4: {
+                title: "大学生创新创业训练项目",
+                content: `
+                    <div class="space-y-4">
+                        <p class="text-gray-700">
+                            本项目基于区块链技术，构建了一个文旅数字资产版权存证与共创平台，为文旅产业的数字化转型提供技术支持。通过整合多源数据，实现了文化资源的有效管理与开发。
+                        </p>
+                        <div>
+                            <h4 class="font-bold text-lg mb-2">项目职责</h4>
+                            <ul class="space-y-2 text-gray-700">
+                                <li class="flex items-start">
+                                    <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                                    <span>基于Python数据处理模块，完成2,000+条历史文献数据清洗，构建结构化知识图谱</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                                    <span>整合用户交互数据，分析行为路径并生成可视化报告，支撑产品迭代决策</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                                    <span>实现区块链底层与文旅数字资产版权存证功能的技术对接，保障数据不可篡改性</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                                    <span>提升数据分析效率30%，优化用户体验</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-2">项目成果</h4>
+                            <ul class="space-y-2 text-gray-700">
+                                <li class="flex items-start">
+                                    <i class="fa fa-trophy text-primary mt-1 mr-2"></i>
+                                    <span>获得国家级大创项目立项</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-chain text-primary mt-1 mr-2"></i>
+                                    <span>成功构建文旅数字资产版权存证系统，保障了文化资源的知识产权</span>
+                                </li>
+                                <li class="flex items-start">
+                                    <i class="fa fa-file-text text-primary mt-1 mr-2"></i>
+                                    <span>撰写《星图共链——基于区块链的文旅数字资产版权存证与共创平台》论文</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-2">技术工具</h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">Python</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">区块链</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">知识图谱</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">数据可视化</span>
+                                <span class="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm">智能合约</span>
+                            </div>
+                        </div>
+                    </div>
+                `
+            }
+        };
+        
+        // 初始化Canvas背景
+        function initCanvas() {
+            const canvas = document.getElementById('canvas-bg');
+            const ctx = canvas.getContext('2d');
+            
+            // 设置Canvas尺寸
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            
+            // 创建粒子
+            const particles = [];
+            const particleCount = 100;
+            
+            for (let i = 0; i < particleCount; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 2 + 1,
+                    color: `rgba(22, 93, 255, ${Math.random() * 0.5 + 0.1})`,
+                    speedX: (Math.random() - 0.5) * 0.5,
+                    speedY: (Math.random() - 0.5) * 0.5
+                });
+            }
+            
+            // 绘制粒子
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                particles.forEach(particle => {
+                    ctx.beginPath();
+                    ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = particle.color;
+                    ctx.fill();
+                });
+                
+                // 绘制粒子间的连线
+                particles.forEach(particle => {
+                    particles.forEach(otherParticle => {
+                        const distance = Math.sqrt(
+                            Math.pow(particle.x - otherParticle.x, 2) + 
+                            Math.pow(particle.y - otherParticle.y, 2)
+                        );
+                        
+                        if (distance < 100) {
+                            ctx.beginPath();
+                            ctx.moveTo(particle.x, particle.y);
+                            ctx.lineTo(otherParticle.x, otherParticle.y);
+                            ctx.strokeStyle = `rgba(22, 93, 255, ${0.2 - distance / 500})`;
+                            ctx.lineWidth = 0.5;
+                            ctx.stroke();
+                        }
+                    });
+                });
+                
+                // 更新粒子位置
+                particles.forEach(particle => {
+                    particle.x += particle.speedX;
+                    particle.y += particle.speedY;
+                    
+                    if (particle.x < 0 || particle.x > canvas.width) {
+                        particle.speedX = -particle.speedX;
+                    }
+                    
+                    if (particle.y < 0 || particle.y > canvas.height) {
+                        particle.speedY = -particle.speedY;
+                    }
+                });
+                
+                requestAnimationFrame(draw);
+            }
+            
+            draw();
+        }
+        
+        // 页面滚动动画
+        function initScrollAnimations() {
+            const revealElements = document.querySelectorAll('.reveal-element');
+            
+            function checkScroll() {
+                revealElements.forEach(element => {
+                    const elementTop = element.getBoundingClientRect().top;
+                    const elementVisible = 150;
+                    
+                    if (elementTop < window.innerHeight - elementVisible) {
+                        element.classList.add('animate-slide-up');
+                    }
+                });
+            }
+            
+            window.addEventListener('scroll', checkScroll);
+            checkScroll(); // 初始检查
+        }
+        
+        // 导航栏滚动效果
+        function initNavbarScroll() {
+            const navbar = document.getElementById('navbar');
+            
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('bg-dark/80', 'bg-blur', 'shadow-lg');
+                    navbar.classList.remove('py-4');
+                    navbar.classList.add('py-2');
+                } else {
+                    navbar.classList.remove('bg-dark/80', 'bg-blur', 'shadow-lg');
+                    navbar.classList.remove('py-2');
+                    navbar.classList.add('py-4');
+                }
+            });
+        }
+        
+        // 项目详情模态框
+        function initProjectModal() {
+            const modal = document.getElementById('project-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalContent = document.getElementById('modal-content');
+            const closeModal = document.getElementById('close-modal');
+            const projectButtons = document.querySelectorAll('.project-details-btn');
+            
+            projectButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const projectId = button.getAttribute('data-project');
+                    const projectData = projectDetails[projectId];
+                    
+                    if (projectData) {
+                        modalTitle.textContent = projectData.title;
+                        modalContent.innerHTML = projectData.content;
+                        modal.classList.remove('hidden');
+                        document.body.style.overflow = 'hidden';
+                    }
+                });
+            });
+            
+            closeModal.addEventListener('click', () => {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            });
+            
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.add('hidden');
+                    document.body.style.overflow = 'auto';
+                }
+            });
+        }
+        
+        // 移动导航菜单
+        function initMobileMenu() {
+            const menuButton = document.querySelector('.fa-bars').parentElement;
+            const closeButton = document.getElementById('close-menu');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileLinks = mobileMenu.querySelectorAll('a');
+            
+            menuButton.addEventListener('click', () => {
+                mobileMenu.classList.remove('translate-x-full');
+                document.body.style.overflow = 'hidden';
+            });
+            
+            closeButton.addEventListener('click', () => {
+                mobileMenu.classList.add('translate-x-full');
+                document.body.style.overflow = 'auto';
+            });
+            
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('translate-x-full');
+                    document.body.style.overflow = 'auto';
+                });
+            });
+        }
+        
+        // 平滑滚动
+        function initSmoothScroll() {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        }
+        
+        // 页面加载完成后初始化
+        window.addEventListener('DOMContentLoaded', () => {
+            initCanvas();
+            initScrollAnimations();
+            initNavbarScroll();
+            initProjectModal();
+            initMobileMenu();
+            initSmoothScroll();
+        });
+    </script>
+</body>
+</html>
+    
