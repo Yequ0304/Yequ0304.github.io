@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片轮播组件</title>
+</head>
+<style>
+    #container {
+        position: relative;
+        width: 600px;
+        height: 400px;
+        border: 3px solid #333;
+        overflow: hidden;
+    }
+    #list {
+        position: absolute;
+        z-index: 1;
+        width: 2400px;
+        height: 400px;
+        left: 0px;
+        transition: left 0.5s ease; /* 添加平滑过渡效果 */
+    }
+    #list img {
+        float: left;
+        width: 600px;
+        height: 400px;
+        object-fit: cover; /* 确保图片完全覆盖容器 */
+    }
+    #buttons {
+        position: absolute;
+        left: 250px;
+        bottom: 20px;
+        z-index: 2;
+        height: 10px;
+        width: 100px;
+    }
+    #buttons span {
+        float: left;
+        margin-right: 5px;
+        width: 10px;
+        height: 10px;
+        border: 1px solid #fff;
+        border-radius: 50%;
+        background: #333;
+        cursor: pointer;
+        transition: background 0.3s ease; /* 添加过渡效果 */
+    }
+    #buttons .on {
+        background: orangered;
+    }
+    .arrow {
+        position: absolute;
+        top: 180px;
+        z-index: 2;
+        width: 40px;
+        height: 40px;
+        font-size: 36px;
+        font-weight: bold;
+        line-height: 39px;
+        text-align: center;
+        color: #fff;
+        background-color: RGBA(0, 0, 0, .3);
+        cursor: pointer;
+        transition: background 0.3s ease; /* 添加过渡效果 */
+    }
+    .arrow:hover {
+        background-color: RGBA(0, 0, 0, .6); /* 鼠标悬停效果 */
+    }
+</style>
+<body>
+    <div id="container">
+        <div id="list">
+            <img src="https://img95.699pic.com/photo/50063/8605.jpg_wh860.jpg" alt="图片1" />
+            <img src="https://ts1.tc.mm.bing.net/th/id/R-C.a72fb3e4cd3ea3aded1cdf6961b949be?rik=saC52VVQjWiW8A&riu=http%3a%2f%2fk.sinaimg.cn%2fn%2fsinakd20121%2f65%2fw1000h665%2f20230223%2fffa7-dfc68da14cef15feb7f43e9b96a7a72f.jpg%2fw700d1q75cms.jpg&ehk=yUy7k0YJhIlZ4sm8cme01O5V2Ol1CEK9MweUt766qI4%3d&risl=&pid=ImgRaw&r=0" alt="图片2" />
+            <img src="https://ts1.tc.mm.bing.net/th/id/R-C.3fab4f5d382d985d20e76939ad62e768?rik=u1GXUmnw25vTSg&riu=http%3a%2f%2fimage.uokon.cn%2f19728-study.jpg&ehk=TsdCWQMrfsUZC6Y7NSXSeqBWFR0DOZRqhKYL%2felxDdk%3d&risl=&pid=ImgRaw&r=0" alt="图片3" />
+            <img src="https://ts1.tc.mm.bing.net/th/id/R-C.13555a1df33af8dee61f09b13d7b4891?rik=4jZl04sOxgOz5A&riu=http%3a%2f%2fn.sinaimg.cn%2fsinacn20111%2f510%2fw1080h1030%2f20190219%2f2dbf-htfpvza0228380.jpg&ehk=X97CyKAmk3UVQ7lK2IaaJawWVWaRFST%2baknWetH7lD0%3d&risl=&pid=ImgRaw&r=0" alt="图片4" />
+        </div>
+        <div id="buttons"></div>
+        <a href="javascript:;" id="prev" class="arrow">&lt;</a>
+        <a href="javascript:;" id="next" class="arrow">&gt;</a>
+    </div>
+    <script>
+        // 基础配置
+        let width = 600; // 图片宽度
+        let list = document.getElementById("list");
+        let prev = document.getElementById("prev");
+        let next = document.getElementById("next");
+        let buttons = document.getElementById("buttons");
+        let num = list.children.length; // 图片数量
+        let index = 1; // 当前显示的图片索引
+        let timer = null; // 自动轮播定时器
+        
+        // 自动生成底部导航按钮
+        function createButtons() {
+            buttons.innerHTML = ''; // 清空原有按钮
+            for (let i = 1; i <= num; i++) {
+                let span = document.createElement('span');
+                span.setAttribute('index', i);
+                if (i === 1) {
+                    span.classList.add('on'); // 第一个按钮默认激活
+                }
+                buttons.appendChild(span);
+                
+                // 为每个按钮添加点击事件
+                span.onclick = function() {
+                    // 先移除所有按钮的激活状态
+                    for (let j = 0; j < buttons.children.length; j++) {
+                        buttons.children[j].classList.remove('on');
+                    }
+                    // 设置当前点击按钮为激活状态
+                    this.classList.add('on');
+                    // 获取点击按钮的索引并切换图片
+                    let idx = parseInt(this.getAttribute('index'));
+                    animate(idx - 1); // 索引从0开始计算
+                };
+            }
+        }
+        
+        // 图片切换动画函数
+        function animate(offset) {
+            index = offset + 1; // 更新当前索引
+            // 确保索引在有效范围内(1-4)
+            if (index > num) {
+                index = 1;
+            } else if (index < 1) {
+                index = num;
+            }
+            // 计算应该移动到的位置
+            let targetLeft = -(index - 1) * width;
+            list.style.left = targetLeft + "px";
+            
+            // 更新底部按钮的激活状态
+            for (let i = 0; i < buttons.children.length; i++) {
+                buttons.children[i].classList.remove('on');
+            }
+            buttons.children[index - 1].classList.add('on');
+        }
+        
+        // 自动轮播函数
+        function autoPlay() {
+            timer = setInterval(function() {
+                animate(index); // 切换到下一张图片
+            }, 3000); // 3秒切换一次
+        }
+        
+        // 鼠标进入容器时暂停自动轮播
+        document.getElementById('container').onmouseenter = function() {
+            clearInterval(timer);
+        };
+        
+        // 鼠标离开容器时恢复自动轮播
+        document.getElementById('container').onmouseleave = function() {
+            autoPlay();
+        };
+        
+        // 初始化函数
+        function init() {
+            createButtons(); // 生成导航按钮
+            autoPlay(); // 启动自动轮播
+            
+            // 为左右箭头添加点击事件
+            prev.onclick = function () {
+                animate(index - 2); // 切换到上一张
+            };
+            next.onclick = function () {
+                animate(index); // 切换到下一张
+            };
+        }
+        
+        // 页面加载完成后初始化
+        window.onload = init;
+    </script>
+</body>
+</html>
